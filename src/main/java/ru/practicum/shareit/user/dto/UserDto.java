@@ -10,9 +10,6 @@ import java.util.Objects;
 
 @Value
 public class UserDto {
-    // id должен отсутствовать в теле запроса.
-    // При добавлении он не нужен, при обновлении - передается в параметре запроса
-    @Null(groups = {ValidatedFull.class, ValidatedPatch.class})
     Long id;
 
     String name;

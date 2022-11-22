@@ -46,5 +46,8 @@ public class ItemController {
         return itemService.patch(id, patchDto, userId);
     }
 
+    private void validateItemDto() {
+
+    }
 
 }
