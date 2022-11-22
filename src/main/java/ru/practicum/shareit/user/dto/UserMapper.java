@@ -22,19 +22,23 @@ public class UserMapper {
 
     public static User fromUserDto(UserDto dto) {
         User user = new User();
-        user.setId(dto.getId());
+//        user.setId(dto.getId());
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         return user;
     }
 
-    public static User patchWithUserDto(User user, UserDto patchDto) {
-        User patchedUser = new User();
-        patchedUser.setId(user.getId());
-        patchedUser.setEmail(
-                Objects.requireNonNullElse(patchDto.getEmail(), user.getEmail()));
-        patchedUser.setName(
-                Objects.requireNonNullElse(patchDto.getName(), user.getName()));
-        return patchedUser;
+    // Заменять пользователя в хранилище - плохая идея,
+    // потому что тогда нужно было бы следить за ссылками на него в других классах, в частности в Item.
+    // Поэтому здесь вносим изменения в существующий объект User, а не возвращаем новый
+    public static void patchWithUserDto(User userToPatch, UserDto patchDto) {
+        String patchEmail = patchDto.getEmail();
+        if (Objects.nonNull(patchEmail)) {
+            userToPatch.setEmail(patchEmail);
+        }
+        String patchName = patchDto.getName();
+        if (Objects.nonNull(patchName)) {
+            userToPatch.setName(patchName);
+        }
     }
 }

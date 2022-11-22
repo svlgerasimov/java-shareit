@@ -19,7 +19,6 @@ import java.util.List;
 //@Validated
 public class UserController {
     private final UserService userService;
-    private final Validator validator;
 
     @GetMapping("/{id}")
     public UserDto getById(@PathVariable long id) {

@@ -19,15 +19,15 @@ public abstract class CrudStorageInMemory<T> implements CrudStorage<T> {
         return entity;
     }
 
-    @Override
-    public boolean update(T entity) {
-        long id = getEntityId(entity);
-        if (entities.containsKey(id)) {
-            entities.put(id, entity);
-            return true;
-        }
-        return false;
-    }
+//    @Override
+//    public boolean update(T entity) {
+//        long id = getEntityId(entity);
+//        if (entities.containsKey(id)) {
+//            entities.put(id, entity);
+//            return true;
+//        }
+//        return false;
+//    }
 
     @Override
     public boolean remove(long id) {

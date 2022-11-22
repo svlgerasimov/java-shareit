@@ -1,26 +1,26 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.Value;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
 /**
  * TODO Sprint add-controllers.
  */
+@Value
 public class ItemDto {
-    // id должен отсутствовать в теле запроса.
-    // При добавлении он не нужен, при обновлении - передается в параметре запроса
     @Null(groups = {UserDto.ValidatedFull.class, UserDto.ValidatedPatch.class})
     Long id;
 
+    @NotNull(groups = UserDto.ValidatedFull.class)
     String name;
 
-    // Почта обязательно должна быть при добавлении, в patch-запросе может отсутствовать
+    String description;
+
     @NotNull(groups = UserDto.ValidatedFull.class)
-    @Email(groups = {UserDto.ValidatedFull.class, UserDto.ValidatedPatch.class})
-    String email;
+    Boolean available;
 
     // Группа валидации при добавлении
     public interface ValidatedFull {}

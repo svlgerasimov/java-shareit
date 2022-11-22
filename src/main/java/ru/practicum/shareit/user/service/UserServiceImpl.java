@@ -5,11 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.StorageWriteException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.List;
@@ -42,17 +40,17 @@ public class UserServiceImpl implements UserService {
                 );
         String patchEmail = patchDto.getEmail();
         if (Objects.nonNull(patchEmail)) {
-            // если пришёл патч запрос с той же почтой, что и раньше - ничего страшного
+            // если пришёл патч запрос с той же почтой, что и была раньше - ничего страшного
             userStorage.getByEmailExcludeId(patchEmail, id).ifPresent(
                     foundUser -> {
                         throw new ConflictException("User with email='" + patchEmail + "' already exists");
                     });
         }
-        user = UserMapper.patchWithUserDto(user, patchDto);
-        if (!userStorage.update(user)) {
-            // вообще в данной реализации такого конечно быть не может
-            throw new StorageWriteException("User " + user + " was not updated in storage");
-        }
+        UserMapper.patchWithUserDto(user, patchDto);
+//        if (!userStorage.update(user)) {
+//            // вообще в данной реализации такого конечно быть не может
+//            throw new StorageWriteException("User " + user + " was not updated in storage");
+//        }
         return UserMapper.toUserDto(user);
     }
 
