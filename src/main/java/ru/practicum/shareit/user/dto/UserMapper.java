@@ -6,14 +6,16 @@ import java.util.Objects;
 
 public class UserMapper {
 
-    private UserMapper(){
+    private UserMapper() {
 
     }
 
     public static UserDto toUserDto(User user) {
         return new UserDto(
                 user.getId(),
-                user.getName(),
+                // если имя не указано, можно отображать вместо него почту;
+                // писать в хранилище почту вместо имени для этого незачем
+                Objects.requireNonNullElse(user.getName(), user.getEmail()),
                 user.getEmail()
         );
     }
@@ -26,15 +28,13 @@ public class UserMapper {
         return user;
     }
 
-//    public static User patchFromUserDto(User user, UserDto patchDto) {
-//        String patchEmail = patchDto.getEmail();
-//        if (Objects.nonNull(patchEmail)) {
-//            user.setEmail(patchEmail);
-//        }
-//        String patchName = patchDto.getName();
-//        if (Objects.nonNull(patchName)) {
-//            user.setName(patchName);
-//        }
-//        return user;
-//    }
+    public static User patchWithUserDto(User user, UserDto patchDto) {
+        User patchedUser = new User();
+        patchedUser.setId(user.getId());
+        patchedUser.setEmail(
+                Objects.requireNonNullElse(patchDto.getEmail(), user.getEmail()));
+        patchedUser.setName(
+                Objects.requireNonNullElse(patchDto.getName(), user.getName()));
+        return patchedUser;
+    }
 }

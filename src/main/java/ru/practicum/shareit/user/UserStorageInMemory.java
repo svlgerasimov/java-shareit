@@ -8,6 +8,22 @@ import java.util.*;
 @Repository
 public class UserStorageInMemory extends CrudStorageInMemory<User> implements UserStorage {
     @Override
+    public Optional<User> getByEmail(String email) {
+        // да, медленно, но in-memory это же временное решение
+        return super.getEntities().values().stream()
+                .filter(user -> Objects.equals(user.getEmail(), email))
+                .findAny();
+    }
+
+    @Override
+    public Optional<User> getByEmailExcludeId(String email, long id) {
+        return super.getEntities().values().stream()
+                .filter(user ->
+                        Objects.equals(user.getEmail(), email) && !Objects.equals(user.getId(), id))
+                .findAny();
+    }
+
+    @Override
     protected User setEntityId(User entity, long id) {
         entity.setId(id);
         return entity;
@@ -18,36 +34,4 @@ public class UserStorageInMemory extends CrudStorageInMemory<User> implements Us
         return entity.getId();
     }
 
-//    private final Map<Long, User> users = new HashMap<>();
-//    private long nextId = 1;
-//
-//    @Override
-//    public User add(User user) {
-//        long id = nextId++;
-//        user.setId(id);
-//        users.put(id, user);
-//        return user;
-//    }
-//
-//    @Override
-//    public boolean update(User user) {
-//        return Objects.isNull(
-//                users.putIfAbsent(user.getId(), user));
-//    }
-//
-//    @Override
-//    public boolean remove(User user) {
-//        return Objects.nonNull(
-//                users.remove(user.getId()));
-//    }
-//
-//    @Override
-//    public List<User> getAll() {
-//        return new ArrayList<>(users.values());
-//    }
-//
-//    @Override
-//    public Optional<User> getById(long id) {
-//        return Optional.ofNullable(users.get(id));
-//    }
 }

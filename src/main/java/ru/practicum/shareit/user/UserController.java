@@ -35,19 +35,16 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto add(@RequestBody @Valid UserDto userDto) {
+//    @Validated(UserDto.ValidatedFull.class)
+//    public UserDto add(@RequestBody @Valid UserDto userDto) {
+    public UserDto add(@RequestBody @Validated(UserDto.ValidatedFull.class) UserDto userDto) {
         return userService.add(userDto);
     }
 
     @PatchMapping("/{id}")
-    public UserDto patch(@PathVariable long id, @RequestBody UserDto patchDto) {
-        UserDto user = userService.getById(id);
-        user = user.patch(patchDto);
-        Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
-        return userService.update(user);
+    public UserDto patch(@PathVariable long id,
+                         @RequestBody @Validated(UserDto.ValidatedPatch.class) UserDto patchDto) {
+        return userService.patch(id, patchDto);
     }
 
     @DeleteMapping("/{id}")

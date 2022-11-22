@@ -1,10 +1,14 @@
 package ru.practicum.shareit.util;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 import java.util.*;
 
 public abstract class CrudStorageInMemory<T> implements CrudStorage<T> {
 
-    private final Map<Long, T> entities = new HashMap<>();
+    @Getter(AccessLevel.PROTECTED)
+    public final Map<Long, T> entities = new HashMap<>();
     private long nextId = 1;
 
     @Override
@@ -44,4 +48,5 @@ public abstract class CrudStorageInMemory<T> implements CrudStorage<T> {
     abstract protected T setEntityId(T entity, long id);
 
     abstract protected Long getEntityId(T entity);
+
 }
