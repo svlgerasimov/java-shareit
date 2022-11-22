@@ -1,7 +1,5 @@
 package ru.practicum.shareit.util;
 
-import ru.practicum.shareit.user.User;
-
 import java.util.List;
 import java.util.Optional;
 

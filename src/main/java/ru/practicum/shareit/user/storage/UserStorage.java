@@ -1,5 +1,6 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.storage;
 
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.CrudStorage;
 
 import java.util.Optional;
