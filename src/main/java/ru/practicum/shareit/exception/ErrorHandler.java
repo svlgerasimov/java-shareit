@@ -49,6 +49,14 @@ public class ErrorHandler {
         return result;
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleCustomValidationException(CustomValidationException exception) {
+        Map<String, String> result = Map.of("Bad request", exception.getMessage());
+        log.warn(String.valueOf(result), exception);
+        return result;
+    }
+
     // Ошибка валидации полей десериализируемого объекта @Valid
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -56,8 +64,8 @@ public class ErrorHandler {
         Map<String, String> result = exception.getFieldErrors().stream()
                 .collect(Collectors.toMap(
                         fieldError ->
-                                String.format("Validation Error in field '%s' with value = '%s'",
-                                        fieldError.getField(), fieldError.getRejectedValue()),
+                                "Validation Error in field '" + fieldError.getField() +
+                                        "' with value = '" + fieldError.getRejectedValue() + "'",
                         fieldError -> Objects.requireNonNullElse(fieldError.getDefaultMessage(), "")));
         log.warn(String.valueOf(result), exception);
         return result;
