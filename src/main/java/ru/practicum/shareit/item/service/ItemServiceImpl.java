@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.AuthenticationErrorException;
@@ -12,11 +13,13 @@ import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Slf4j
 public class ItemServiceImpl implements ItemService {
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
@@ -27,7 +30,9 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
         Item item = ItemMapper.fromItemDto(dto);
         item.setOwner(owner);
-        return ItemMapper.toItemDto(itemStorage.add(item));
+        item = itemStorage.add(item);
+        log.debug("Add item " + item);
+        return ItemMapper.toItemDto(item);
     }
 
     @Override
@@ -38,6 +43,7 @@ public class ItemServiceImpl implements ItemService {
             throw new AuthenticationErrorException("User id=" + userId + " is not owner of item id=" + itemId);
         }
         ItemMapper.patchFromDto(item, dto);
+        log.debug("Patch item " + item);
         return ItemMapper.toItemDto(item);
     }
 
@@ -62,6 +68,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(String text) {
+        if (text.isEmpty()) {
+            return Collections.emptyList();
+        }
         return itemStorage.search(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());

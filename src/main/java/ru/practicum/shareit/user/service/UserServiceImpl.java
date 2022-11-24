@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Slf4j
 //@Validated
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
@@ -27,9 +29,9 @@ public class UserServiceImpl implements UserService {
                 foundUser -> {
                     throw new ConflictException("User with email='" + dto.getEmail() + "' already exists");
                 });
-        return UserMapper.toUserDto(
-                userStorage.add(UserMapper.fromUserDto(dto))
-        );
+        User user = userStorage.add(UserMapper.fromUserDto(dto));
+        log.debug("Add user " + user);
+        return UserMapper.toUserDto(user);
     }
 
     @Override
@@ -51,6 +53,7 @@ public class UserServiceImpl implements UserService {
 //            // вообще в данной реализации такого конечно быть не может
 //            throw new StorageWriteException("User " + user + " was not updated in storage");
 //        }
+        log.debug("Patch user " + user);
         return UserMapper.toUserDto(user);
     }
 
@@ -68,6 +71,7 @@ public class UserServiceImpl implements UserService {
         if(!userStorage.remove(id)) {
             throw new NotFoundException("User with id=" + id + " not found");
         }
+        log.debug("Remove user id=" + id);
     }
 
     @Override

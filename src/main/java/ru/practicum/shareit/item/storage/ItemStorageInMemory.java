@@ -31,8 +31,12 @@ public class ItemStorageInMemory extends CrudStorageInMemory<Item> implements It
 
     @Override
     public List<Item> search(String text) {
+        String lowerCaseText = text.toLowerCase();
         return getEntities().values().stream()
-                .filter(item -> item.getName().contains(text) || item.getDescription().contains(text))
+                .filter(item ->
+                        (item.getName().toLowerCase().contains(lowerCaseText)
+                                || item.getDescription().toLowerCase().contains(lowerCaseText))
+                                && item.getAvailable())
                 .collect(Collectors.toList());
     }
 }

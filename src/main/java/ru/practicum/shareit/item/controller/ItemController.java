@@ -40,6 +40,7 @@ public class ItemController {
 //                       @RequestHeader("X-Sharer-User-Id") long userId) {
     public ItemDto add(@RequestBody ItemDto itemDto,
                        @RequestHeader("X-Sharer-User-Id") long userId) {
+        fullValidateItemDto(itemDto);
         return itemService.add(itemDto, userId);
     }
 
@@ -48,8 +49,9 @@ public class ItemController {
 //                         @RequestBody @Validated(ItemDto.ValidatedPatch.class) ItemDto patchDto,
 //                         @RequestHeader("X-Sharer-User-Id") long userId) {
     public ItemDto patch(@PathVariable long id,
-                         @RequestBody @Valid ItemDto patchDto,
+                         @RequestBody ItemDto patchDto,
                          @RequestHeader("X-Sharer-User-Id") long userId) {
+        patchValidateItemDto(patchDto);
         return itemService.patch(id, patchDto, userId);
     }
 
@@ -66,6 +68,15 @@ public class ItemController {
         }
         if (!itemDto.hasAvailable()) {
             throw new CustomValidationException("No 'available' field");
+        }
+    }
+
+    private void patchValidateItemDto(ItemDto itemDto) {
+        if (itemDto.hasName() && itemDto.getName().isBlank()) {
+            throw new CustomValidationException("'name' field is blank");
+        }
+        if (itemDto.hasDescription() && itemDto.getDescription().isBlank()) {
+            throw new CustomValidationException("'description' field is blank");
         }
     }
 

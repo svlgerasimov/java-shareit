@@ -14,14 +14,19 @@ public class UserDto {
 
     String name;
 
-    // Почта обязательно должна быть при добавлении, в patch-запросе может отсутствовать
-    @NotNull(groups = ValidatedFull.class)
-    @Email(groups = {ValidatedFull.class, ValidatedPatch.class})
+//    // Почта обязательно должна быть при добавлении, в patch-запросе может отсутствовать
+//    @NotNull(groups = ValidatedFull.class)
+//    @Email(groups = {ValidatedFull.class, ValidatedPatch.class})
+    @Email
     String email;
 
-    // Группа валидации при добавлении
-    public interface ValidatedFull {}
+//    // Группа валидации при добавлении
+//    public interface ValidatedFull {}
+//
+//    // Группа валидации при patch-запросе
+//    public interface ValidatedPatch {}
 
-    // Группа валидации при patch-запросе
-    public interface ValidatedPatch {}
+    public boolean hasEmail() {
+        return Objects.nonNull(email);
+    }
 }
