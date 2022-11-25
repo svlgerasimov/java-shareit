@@ -34,8 +34,6 @@ public class ItemController {
     }
 
     @PostMapping
-//    public ItemDto add(@RequestBody @Validated(ItemDto.ValidatedFull.class) ItemDto itemDto,
-//                       @RequestHeader("X-Sharer-User-Id") long userId) {
     public ItemDto add(@RequestBody ItemDto itemDto,
                        @RequestHeader("X-Sharer-User-Id") long userId) {
         fullValidateItemDto(itemDto);
@@ -43,9 +41,6 @@ public class ItemController {
     }
 
     @PatchMapping("/{id}")
-//    public ItemDto patch(@PathVariable long id,
-//                         @RequestBody @Validated(ItemDto.ValidatedPatch.class) ItemDto patchDto,
-//                         @RequestHeader("X-Sharer-User-Id") long userId) {
     public ItemDto patch(@PathVariable long id,
                          @RequestBody ItemDto patchDto,
                          @RequestHeader("X-Sharer-User-Id") long userId) {
