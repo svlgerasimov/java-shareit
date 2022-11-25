@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface ItemStorage extends CrudStorage<Item> {
     List<Item> getAll(User owner);
+
     List<Item> search(String text);
 }

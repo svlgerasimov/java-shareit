@@ -19,16 +19,6 @@ public abstract class CrudStorageInMemory<T> implements CrudStorage<T> {
         return entity;
     }
 
-//    @Override
-//    public boolean update(T entity) {
-//        long id = getEntityId(entity);
-//        if (entities.containsKey(id)) {
-//            entities.put(id, entity);
-//            return true;
-//        }
-//        return false;
-//    }
-
     @Override
     public boolean remove(long id) {
         return Objects.nonNull(
@@ -45,8 +35,7 @@ public abstract class CrudStorageInMemory<T> implements CrudStorage<T> {
         return Optional.ofNullable(entities.get(id));
     }
 
-    abstract protected T setEntityId(T entity, long id);
+    protected abstract T setEntityId(T entity, long id);
 
-    abstract protected Long getEntityId(T entity);
-
+    protected abstract Long getEntityId(T entity);
 }

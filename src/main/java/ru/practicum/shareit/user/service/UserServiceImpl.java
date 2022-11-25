@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 //@Validated
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
-//    private final Validator validator;
 
     @Override
     public UserDto add(UserDto dto) {
@@ -49,26 +48,13 @@ public class UserServiceImpl implements UserService {
                     });
         }
         UserMapper.patchWithUserDto(user, patchDto);
-//        if (!userStorage.update(user)) {
-//            // вообще в данной реализации такого конечно быть не может
-//            throw new StorageWriteException("User " + user + " was not updated in storage");
-//        }
         log.debug("Patch user " + user);
         return UserMapper.toUserDto(user);
     }
 
-//    @Override
-////    public UserDto update(@Valid UserDto dto) {
-//    public UserDto update(UserDto dto) {
-//        if(!userStorage.update(UserMapper.fromUserDto(dto))) {
-//            throw new NotFoundException("User with id=" + dto.getId() + " not found");
-//        }
-//        return dto;
-//    }
-
     @Override
     public void remove(long id) {
-        if(!userStorage.remove(id)) {
+        if (!userStorage.remove(id)) {
             throw new NotFoundException("User with id=" + id + " not found");
         }
         log.debug("Remove user id=" + id);
