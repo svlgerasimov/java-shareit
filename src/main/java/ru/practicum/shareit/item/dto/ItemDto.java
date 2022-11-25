@@ -4,9 +4,6 @@ import lombok.Value;
 
 import java.util.Objects;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Value
 public class ItemDto {
     Long id;
