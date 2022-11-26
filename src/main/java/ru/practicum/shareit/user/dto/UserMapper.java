@@ -13,9 +13,7 @@ public class UserMapper {
     public static UserDto toUserDto(User user) {
         return new UserDto(
                 user.getId(),
-                // если имя не указано, можно отображать вместо него почту;
-                // писать в хранилище почту вместо имени для этого незачем
-                Objects.requireNonNullElse(user.getName(), user.getEmail()),
+                user.getName(),
                 user.getEmail()
         );
     }
