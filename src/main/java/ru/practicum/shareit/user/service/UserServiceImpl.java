@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
-//@Validated
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
