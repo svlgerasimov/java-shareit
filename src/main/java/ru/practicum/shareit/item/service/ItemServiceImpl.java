@@ -26,8 +26,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto add(ItemDto dto, long userId) {
-        User owner = userStorage.getById(userId)
-                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+        User owner = getOwner(userId);
         Item item = ItemMapper.fromItemDto(dto);
         item.setOwner(owner);
         item = itemStorage.add(item);
@@ -59,8 +58,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAll(long userId) {
-        User owner = userStorage.getById(userId)
-                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+        User owner = getOwner(userId);
         return itemStorage.getAll(owner).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -74,5 +72,10 @@ public class ItemServiceImpl implements ItemService {
         return itemStorage.search(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
+    }
+
+    private User getOwner(long userId) {
+        return userStorage.getById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
     }
 }
