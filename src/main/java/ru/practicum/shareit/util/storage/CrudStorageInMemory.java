@@ -1,4 +1,4 @@
-package ru.practicum.shareit.util;
+package ru.practicum.shareit.util.storage;
 
 import lombok.AccessLevel;
 import lombok.Getter;

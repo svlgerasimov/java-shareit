@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.storage;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.util.CrudStorageInMemory;
+import ru.practicum.shareit.util.storage.CrudStorageInMemory;
 
 import java.util.List;
 import java.util.Objects;

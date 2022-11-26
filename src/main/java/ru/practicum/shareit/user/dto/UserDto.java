@@ -3,16 +3,23 @@ package ru.practicum.shareit.user.dto;
 import lombok.Value;
 
 import javax.validation.constraints.Email;
-import java.util.Objects;
+import javax.validation.constraints.NotNull;
 
 @Value
 public class UserDto {
     Long id;
+
     String name;
-    @Email
+
+    @Email(groups = {FullValidated.class, PatchValidated.class})
+    @NotNull(groups = FullValidated.class)
     String email;
 
-    public boolean hasEmail() {
-        return Objects.nonNull(email);
+    public interface FullValidated {
+
+    }
+
+    public interface PatchValidated {
+
     }
 }
