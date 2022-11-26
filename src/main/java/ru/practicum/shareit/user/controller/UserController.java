@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-//@Validated
 public class UserController {
     private final UserService userService;
 
