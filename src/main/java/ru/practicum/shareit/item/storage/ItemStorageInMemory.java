@@ -5,12 +5,30 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.storage.CrudStorageInMemory;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
 public class ItemStorageInMemory extends CrudStorageInMemory<Item> implements ItemStorage {
+
+    private final Map<Long, List<Item>> userItemIndex = new HashMap<>();
+
+    @Override
+    public Item add(Item item) {
+        item = super.add(item);
+        userItemIndex
+                .computeIfAbsent(item.getOwner().getId(), ownerId -> new ArrayList<>())
+                .add(item);
+        return item;
+    }
+
+    @Override
+    public boolean remove(long id) {
+        userItemIndex.values()
+                .forEach(items -> items.removeIf(item -> item.getId().equals(id)));
+        return super.remove(id);
+    }
+
     @Override
     protected Item setEntityId(Item entity, long id) {
         entity.setId(id);
@@ -24,9 +42,7 @@ public class ItemStorageInMemory extends CrudStorageInMemory<Item> implements It
 
     @Override
     public List<Item> getAll(User owner) {
-        return getEntities().values().stream()
-                .filter(item -> Objects.equals(item.getOwner(), owner))
-                .collect(Collectors.toList());
+        return userItemIndex.getOrDefault(owner.getId(), Collections.emptyList());
     }
 
     @Override
