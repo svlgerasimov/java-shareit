@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.constraints.NotBlank;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -26,8 +28,8 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
-        return itemService.search(text);
+    public List<ItemDto> search(@RequestParam @NotBlank String text) {
+        return text.isEmpty() ? Collections.emptyList() : itemService.search(text);
     }
 
     @PostMapping
