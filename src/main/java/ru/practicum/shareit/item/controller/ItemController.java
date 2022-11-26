@@ -28,7 +28,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text) {
-        return text.isEmpty() ? Collections.emptyList() : itemService.search(text);
+        return text.isBlank() ? Collections.emptyList() : itemService.search(text);
     }
 
     @PostMapping

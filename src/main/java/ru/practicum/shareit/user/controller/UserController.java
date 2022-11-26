@@ -27,7 +27,6 @@ public class UserController {
 
     @PostMapping
     public UserDto add(@RequestBody @Validated(UserDto.FullValidated.class) UserDto userDto) {
-//        fullValidateUserDto(userDto);
         return userService.add(userDto);
     }
 

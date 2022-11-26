@@ -5,7 +5,6 @@ import ru.practicum.shareit.util.validation.NullableNotBlank;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Value
 public class UserDto {
@@ -16,7 +15,8 @@ public class UserDto {
     String name;
 
     @Email(groups = {FullValidated.class, PatchValidated.class})
-    @NotNull(groups = FullValidated.class)
+    @NotBlank(groups = FullValidated.class)
+    @NullableNotBlank(groups = PatchValidated.class)
     String email;
 
     public interface FullValidated {
