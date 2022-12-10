@@ -1,25 +1,23 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
 
 import lombok.Value;
 import ru.practicum.shareit.util.validation.NullableNotBlank;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Value
-public class ItemDto {
+public class UserDto {
     Long id;
 
     @NotBlank(groups = FullValidated.class)
     @NullableNotBlank(groups = PatchValidated.class)
     String name;
 
+    @Email(groups = {FullValidated.class, PatchValidated.class})
     @NotBlank(groups = FullValidated.class)
     @NullableNotBlank(groups = PatchValidated.class)
-    String description;
-
-    @NotNull(groups = FullValidated.class)
-    Boolean available;
+    String email;
 
     public interface FullValidated {
 
