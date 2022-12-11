@@ -7,8 +7,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.user.dto.*;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
@@ -22,6 +21,8 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 //    private final UserStorage userStorage;
     private final UserRepository userRepository;
+    private final UserDtoMapper userDtoMapper;
+    private final UserPatchDtoMapper userPatchDtoMapper;
 
     @Override
     public UserDto add(UserDto dto) {
@@ -30,13 +31,15 @@ public class UserServiceImpl implements UserService {
                     throw new ConflictException("User with email='" + dto.getEmail() + "' already exists");
                 });
 //        User user = userStorage.add(UserMapper.fromUserDto(dto));
-        User user = userRepository.save(UserMapper.fromUserDto(dto));
+//        User user = userRepository.save(UserMapper.fromUserDto(dto));
+        User user = userRepository.save(userDtoMapper.fromDto(dto));
         log.debug("Add user " + user);
-        return UserMapper.toUserDto(user);
+//        return UserMapper.toUserDto(user);
+        return userDtoMapper.toDto(user);
     }
 
     @Override
-    public UserDto patch(long id, UserDto patchDto) {
+    public UserDto patch(long id, UserPatchDto patchDto) {
         User user = userRepository.findById(id)
                 .orElseThrow(
                         () -> new NotFoundException("User with id=" + id + " not found")
@@ -50,10 +53,12 @@ public class UserServiceImpl implements UserService {
                         throw new ConflictException("User with email='" + patchEmail + "' already exists");
                     });
         }
-        UserMapper.patchWithUserDto(user, patchDto);
+//        UserMapper.patchWithUserDto(user, patchDto);
+        userPatchDtoMapper.updateWithPatchDto(user, patchDto);
         user = userRepository.save(user);
         log.debug("Patch user " + user);
-        return UserMapper.toUserDto(user);
+//        return UserMapper.toUserDto(user);
+        return userDtoMapper.toDto(user);
     }
 
     @Override
@@ -74,13 +79,15 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAll() {
         return userRepository.findAll()
                 .stream()
-                .map(UserMapper::toUserDto)
+//                .map(UserMapper::toUserDto)
+                .map(userDtoMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserDto getById(long id) {
-        return UserMapper.toUserDto(
+//        return UserMapper.toUserDto(
+        return userDtoMapper.toDto(
                 userRepository.findById(id)
                         .orElseThrow(
                                 () -> new NotFoundException("User with id=" + id + " not found")

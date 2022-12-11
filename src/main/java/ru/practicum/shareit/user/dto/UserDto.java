@@ -10,20 +10,23 @@ import javax.validation.constraints.NotBlank;
 public class UserDto {
     Long id;
 
-    @NotBlank(groups = FullValidated.class)
-    @NullableNotBlank(groups = PatchValidated.class)
+//    @NotBlank(groups = FullValidated.class)
+//    @NullableNotBlank(groups = PatchValidated.class)
+    @NotBlank
     String name;
 
-    @Email(groups = {FullValidated.class, PatchValidated.class})
-    @NotBlank(groups = FullValidated.class)
-    @NullableNotBlank(groups = PatchValidated.class)
+//    @Email(groups = {FullValidated.class, PatchValidated.class})
+//    @NotBlank(groups = FullValidated.class)
+//    @NullableNotBlank(groups = PatchValidated.class)
+    @Email
+    @NotBlank
     String email;
 
-    public interface FullValidated {
-
-    }
-
-    public interface PatchValidated {
-
-    }
+//    public interface FullValidated {
+//
+//    }
+//
+//    public interface PatchValidated {
+//
+//    }
 }
