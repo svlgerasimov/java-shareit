@@ -6,8 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.AuthenticationErrorException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.item.storage.ItemStorage;
@@ -29,35 +28,42 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final ItemDtoMapper itemDtoMapper;
+    private final ItemPatchDtoMapper itemPatchDtoMapper;
 
     @Override
     public ItemDto add(ItemDto dto, long userId) {
         User owner = getOwner(userId);
-        Item item = ItemMapper.fromItemDto(dto);
+//        Item item = ItemMapper.fromItemDto(dto);
+        Item item = itemDtoMapper.fromDto(dto);
         item.setOwner(owner);
 //        item = itemStorage.add(item);
         item = itemRepository.save(item);
         log.debug("Add item " + item);
-        return ItemMapper.toItemDto(item);
+//        return ItemMapper.toItemDto(item);
+        return itemDtoMapper.toDto(item);
     }
 
     @Override
-    public ItemDto patch(long itemId, ItemDto dto, long userId) {
+    public ItemDto patch(long itemId, ItemPatchDto dto, long userId) {
 //        Item item = itemStorage.getById(itemId)
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item with id=" + itemId + " not found"));
         if (!item.getOwner().getId().equals(userId)) {
             throw new AuthenticationErrorException("User id=" + userId + " is not owner of item id=" + itemId);
         }
-        ItemMapper.patchFromDto(item, dto);
+//        ItemMapper.patchFromDto(item, dto);
+        itemPatchDtoMapper.updateWithPatchDto(item, dto);
         item = itemRepository.save(item);
         log.debug("Patch item " + item);
-        return ItemMapper.toItemDto(item);
+//        return ItemMapper.toItemDto(item);
+        return itemDtoMapper.toDto(item);
     }
 
     @Override
     public ItemDto getById(long id) {
-        return ItemMapper.toItemDto(
+//        return ItemMapper.toItemDto(
+        return itemDtoMapper.toDto(
 //                itemStorage.getById(id)
                 itemRepository.findById(id)
                         .orElseThrow(
@@ -71,7 +77,8 @@ public class ItemServiceImpl implements ItemService {
         User owner = getOwner(userId);
 //        return itemStorage.getAll(owner).stream()
         return itemRepository.findAllByOwner(owner).stream()
-                .map(ItemMapper::toItemDto)
+//                .map(ItemMapper::toItemDto)
+                .map(itemDtoMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -79,7 +86,8 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> search(String text) {
 //        return itemStorage.search(text).stream()
         return itemRepository.search(text.toLowerCase()).stream()
-                .map(ItemMapper::toItemDto)
+//                .map(ItemMapper::toItemDto)
+                .map(itemDtoMapper::toDto)
                 .collect(Collectors.toList());
     }
 

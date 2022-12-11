@@ -10,22 +10,25 @@ import javax.validation.constraints.NotNull;
 public class ItemDto {
     Long id;
 
-    @NotBlank(groups = FullValidated.class)
-    @NullableNotBlank(groups = PatchValidated.class)
+//    @NotBlank(groups = FullValidated.class)
+//    @NullableNotBlank(groups = PatchValidated.class)
+    @NotBlank
     String name;
 
-    @NotBlank(groups = FullValidated.class)
-    @NullableNotBlank(groups = PatchValidated.class)
+//    @NotBlank(groups = FullValidated.class)
+//    @NullableNotBlank(groups = PatchValidated.class)
+    @NotBlank
     String description;
 
-    @NotNull(groups = FullValidated.class)
+//    @NotNull(groups = FullValidated.class)
+    @NotNull
     Boolean available;
 
-    public interface FullValidated {
-
-    }
-
-    public interface PatchValidated {
-
-    }
+//    public interface FullValidated {
+//
+//    }
+//
+//    public interface PatchValidated {
+//
+//    }
 }
