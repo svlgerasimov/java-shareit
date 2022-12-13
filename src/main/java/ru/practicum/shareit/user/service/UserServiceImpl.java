@@ -26,10 +26,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto add(UserDto dto) {
-        userRepository.findByEmail(dto.getEmail()).ifPresent(
-                foundUser -> {
-                    throw new ConflictException("User with email='" + dto.getEmail() + "' already exists");
-                });
+//        userRepository.findByEmail(dto.getEmail()).ifPresent(
+//                foundUser -> {
+//                    throw new ConflictException("User with email='" + dto.getEmail() + "' already exists");
+//                });
+
 //        User user = userStorage.add(UserMapper.fromUserDto(dto));
 //        User user = userRepository.save(UserMapper.fromUserDto(dto));
         User user = userRepository.save(userDtoMapper.fromDto(dto));

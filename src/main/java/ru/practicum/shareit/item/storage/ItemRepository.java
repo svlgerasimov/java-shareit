@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findAllByOwner(User owner);
@@ -15,4 +16,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "from Item as it " +
             "where (lower(it.name) like %:text% or lower(it.description) like %:text%) and it.available=true")
     List<Item> search(@Param("text") String textInLowerCase);
+
+    Optional<Item> findByIdAndOwnerIdNot(Long id, Long ownerId);
 }

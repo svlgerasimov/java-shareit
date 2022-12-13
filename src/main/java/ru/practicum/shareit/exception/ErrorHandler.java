@@ -8,6 +8,7 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Map;
@@ -22,6 +23,14 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFoundException(NotFoundException exception) {
         Map<String, String> result = Map.of("Not Found Error", exception.getMessage());
+        log.warn(String.valueOf(result), exception);
+        return result;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleCustomValidationException(CustomValidationException exception) {
+        Map<String, String> result = Map.of("error", exception.getMessage());
         log.warn(String.valueOf(result), exception);
         return result;
     }
@@ -82,6 +91,16 @@ public class ErrorHandler {
         log.warn(String.valueOf(result), exception);
         return result;
     }
+
+//    @ExceptionHandler
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public Map<String, String> handleMethodArgumentTypeMismatchException(
+//            MethodArgumentTypeMismatchException exception) {
+//        String message = exception.getMessage();
+//        Map<String, String> result = Map.of("error", Objects.isNull(message) ? "Details unknown" : message);
+//        log.warn(String.valueOf(result), exception);
+//        return result;
+//    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
