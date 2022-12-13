@@ -8,7 +8,6 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Map;
@@ -91,16 +90,6 @@ public class ErrorHandler {
         log.warn(String.valueOf(result), exception);
         return result;
     }
-
-//    @ExceptionHandler
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public Map<String, String> handleMethodArgumentTypeMismatchException(
-//            MethodArgumentTypeMismatchException exception) {
-//        String message = exception.getMessage();
-//        Map<String, String> result = Map.of("error", Objects.isNull(message) ? "Details unknown" : message);
-//        log.warn(String.valueOf(result), exception);
-//        return result;
-//    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)

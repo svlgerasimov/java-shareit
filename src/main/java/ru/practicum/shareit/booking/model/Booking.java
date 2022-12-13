@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.model;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,9 +10,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/**
- * TODO Sprint add-bookings.
- */
 @Entity
 @Table(name = "bookings")
 @Getter

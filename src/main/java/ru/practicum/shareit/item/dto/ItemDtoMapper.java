@@ -15,15 +15,12 @@ public interface ItemDtoMapper {
 
     ItemDto toDto(Item item);
 
-//    @Mapping(target = "nextBooking", source = "nextBooking")
     @Mapping(target = "id", source = "item.id")
     ItemDtoOutExtended toDtoExtended(Item item, List<Comment> comments, Booking lastBooking, Booking nextBooking);
 
     @Mapping(target = "nextBooking", ignore = true)
     @Mapping(target = "lastBooking", ignore = true)
     ItemDtoOutExtended toDtoExtended(Item item, List<Comment> comments);
-
-//    List<ItemDtoOutWithBookings> toDtoWithBookings(List<Item> items);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", ignore = true)

@@ -7,9 +7,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- */
 @Value
 public class BookingDtoOut {
     Long id;
