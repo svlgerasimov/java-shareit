@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoMapper;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
@@ -24,6 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
@@ -31,6 +33,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingDtoMapper bookingDtoMapper;
 
     @Override
+    @Transactional
     public BookingDtoOut add(BookingDtoIn dto, long userId) {
         Item item = itemRepository.findByIdAndOwnerIdNot(dto.getItemId(), userId)
                 .orElseThrow(() -> new NotFoundException(
@@ -48,6 +51,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDtoOut approve(long bookingId, long userId, boolean approved) {
         Booking booking = bookingRepository.findByIdAndItemOwnerId(bookingId, userId)
                 .orElseThrow(() -> new NotFoundException(
