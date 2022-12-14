@@ -7,7 +7,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.dto.BookingSearchState;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.exception.CustomValidationException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -42,21 +41,13 @@ public class BookingController {
     public List<BookingDtoOut> findByBooker(
             @RequestParam(required = false, defaultValue = "ALL") String state,
             @RequestHeader("X-Sharer-User-Id") long userId) {
-        try {
-            return bookingService.findByBooker(userId, BookingSearchState.valueOf(state));
-        } catch (IllegalArgumentException exception) {
-            throw new CustomValidationException("Unknown state: " + state);
-        }
+        return bookingService.findByBooker(userId, BookingSearchState.of(state));
     }
 
     @GetMapping("/owner")
     public List<BookingDtoOut> findByOwner(
             @RequestParam(required = false, defaultValue = "ALL") String state,
             @RequestHeader("X-Sharer-User-Id") long userId) {
-        try {
-            return bookingService.findByOwner(userId, BookingSearchState.valueOf(state));
-        } catch (IllegalArgumentException exception) {
-            throw new CustomValidationException("Unknown state: " + state);
-        }
+        return bookingService.findByOwner(userId, BookingSearchState.of(state));
     }
 }

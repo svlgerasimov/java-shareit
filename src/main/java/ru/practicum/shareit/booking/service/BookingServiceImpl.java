@@ -91,6 +91,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 bookings = bookingRepository.findByBookerAndStatusIsOrderByStartDesc(booker, BookingStatus.REJECTED);
                 break;
+            case ALL:
             default:
                 bookings = bookingRepository.findByBookerOrderByStartDesc(booker);
                 break;
@@ -120,6 +121,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 bookings = bookingRepository.findByItemOwnerAndStatusIsOrderByStartDesc(owner, BookingStatus.REJECTED);
                 break;
+            case ALL:
             default:
                 bookings = bookingRepository.findByItemOwnerOrderByStartDesc(owner);
                 break;
