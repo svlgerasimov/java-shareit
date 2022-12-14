@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.exception.AuthenticationErrorException;
 import ru.practicum.shareit.exception.CustomValidationException;
@@ -81,12 +82,12 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.groupingBy(Comment::getItem, Collectors.toList()));
 
         LocalDateTime now = LocalDateTime.now();
-        List<Booking> lastBookings = bookingRepository.findAllByItemInAndStartBefore(items, now,
-                Sort.by(Sort.Direction.DESC, "start"));
+        List<Booking> lastBookings = bookingRepository.findAllByItemInAndStartBeforeAndStatusIs(
+                items, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"));
         Map<Item, Booking> lastBookingsByItems = lastBookings.stream()
                 .collect(Collectors.toMap(Booking::getItem, Function.identity(), (booking1, booking2) -> booking1));
-        List<Booking> nextBookings = bookingRepository.findAllByItemInAndStartAfter(items, now,
-                Sort.by(Sort.Direction.ASC, "start"));
+        List<Booking> nextBookings = bookingRepository.findAllByItemInAndStartAfterAndStatusIs(
+                items, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "start"));
         Map<Item, Booking> nextBookingsByItems = nextBookings.stream()
                 .collect(Collectors.toMap(Booking::getItem, Function.identity(), (booking1, booking2) -> booking1));
 
@@ -138,10 +139,12 @@ public class ItemServiceImpl implements ItemService {
     private ItemDtoOutExtended formDtoExtendedWithBookings(Item item) {
         LocalDateTime now = LocalDateTime.now();
         Booking lastBooking = bookingRepository
-                .findFirstByItemAndStartBefore(item, now, Sort.by(Sort.Direction.DESC, "start"))
+                .findFirstByItemAndStartBeforeAndStatusIs(
+                        item, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
                 .orElse(null);
         Booking nextBooking = bookingRepository
-                .findFirstByItemAndStartAfter(item, now, Sort.by(Sort.Direction.ASC, "start"))
+                .findFirstByItemAndStartAfterAndStatusIs(
+                        item, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "start"))
                 .orElse(null);
         List<Comment> comments = commentRepository.findAllByItem(item);
         return itemDtoMapper.toDtoExtended(item, comments, lastBooking, nextBooking);
