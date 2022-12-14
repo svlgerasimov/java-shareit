@@ -20,8 +20,9 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,9 +75,24 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDtoOutExtended> getAll(long userId) {
         User owner = getUser(userId);
-        return itemRepository.findAllByOwner(owner).stream()
-                .sorted(Comparator.comparingLong(Item::getId))
-                .map(this::formDtoExtendedWithBookings)
+        List<Item> items = itemRepository.findAllByOwner(owner, Sort.by(Sort.Direction.ASC, "id"));
+        List<Comment> comments = commentRepository.findAllByItemIn(items);
+        Map<Item, List<Comment>> commentsByItems = comments.stream()
+                .collect(Collectors.groupingBy(Comment::getItem, Collectors.toList()));
+
+        LocalDateTime now = LocalDateTime.now();
+        List<Booking> lastBookings = bookingRepository.findAllByItemInAndStartBefore(items, now,
+                Sort.by(Sort.Direction.DESC, "start"));
+        Map<Item, Booking> lastBookingsByItems = lastBookings.stream()
+                .collect(Collectors.toMap(Booking::getItem, Function.identity(), (booking1, booking2) -> booking1));
+        List<Booking> nextBookings = bookingRepository.findAllByItemInAndStartAfter(items, now,
+                Sort.by(Sort.Direction.ASC, "start"));
+        Map<Item, Booking> nextBookingsByItems = nextBookings.stream()
+                .collect(Collectors.toMap(Booking::getItem, Function.identity(), (booking1, booking2) -> booking1));
+
+        return items.stream()
+                .map(item -> itemDtoMapper.toDtoExtended(item, commentsByItems.get(item),
+                        lastBookingsByItems.get(item), nextBookingsByItems.get(item)))
                 .collect(Collectors.toList());
     }
 
@@ -120,14 +136,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private ItemDtoOutExtended formDtoExtendedWithBookings(Item item) {
-        List<Comment> comments = commentRepository.findAllByItem(item);
         LocalDateTime now = LocalDateTime.now();
         Booking lastBooking = bookingRepository
                 .findFirstByItemAndStartBefore(item, now, Sort.by(Sort.Direction.DESC, "start"))
                 .orElse(null);
         Booking nextBooking = bookingRepository
-                .findFirstByItemAndStartAfter(item, now, Sort.by(Sort.Direction.DESC, "start"))
+                .findFirstByItemAndStartAfter(item, now, Sort.by(Sort.Direction.ASC, "start"))
                 .orElse(null);
+        List<Comment> comments = commentRepository.findAllByItem(item);
         return itemDtoMapper.toDtoExtended(item, comments, lastBooking, nextBooking);
     }
 }

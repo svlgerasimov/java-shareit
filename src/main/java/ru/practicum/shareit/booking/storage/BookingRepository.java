@@ -49,7 +49,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Optional<Booking> findFirstByItemAndStartAfter(Item item, LocalDateTime minStart, Sort sort);
 
+    List<Booking> findAllByItemInAndStartAfter(List<Item> items, LocalDateTime minStart, Sort sort);
+
     Optional<Booking> findFirstByItemAndStartBefore(Item item, LocalDateTime maxStart, Sort sort);
+
+    List<Booking> findAllByItemInAndStartBefore(List<Item> items, LocalDateTime maxStart, Sort sort);
 
     Optional<Booking> findFirstByItemAndBookerAndEndBefore(Item item, User booker, LocalDateTime maxEnd);
 }
