@@ -71,23 +71,6 @@ public class ItemServiceImpl implements ItemService {
                 formDtoExtended(item);
     }
 
-    private ItemDtoOutExtended formDtoExtended(Item item) {
-        List<Comment> comments = commentRepository.findAllByItem(item);
-        return itemDtoMapper.toDtoExtended(item, comments);
-    }
-
-    private ItemDtoOutExtended formDtoExtendedWithBookings(Item item) {
-        List<Comment> comments = commentRepository.findAllByItem(item);
-        LocalDateTime now = LocalDateTime.now();
-        Booking lastBooking = bookingRepository
-                .findFirstByItemAndStartBefore(item, now, Sort.by(Sort.Direction.DESC, "start"))
-                .orElse(null);
-        Booking nextBooking = bookingRepository
-                .findFirstByItemAndStartAfter(item, now, Sort.by(Sort.Direction.DESC, "start"))
-                .orElse(null);
-        return itemDtoMapper.toDtoExtended(item, comments, lastBooking, nextBooking);
-    }
-
     @Override
     public List<ItemDtoOutExtended> getAll(long userId) {
         User owner = getUser(userId);
@@ -129,5 +112,22 @@ public class ItemServiceImpl implements ItemService {
     private User getUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+    }
+
+    private ItemDtoOutExtended formDtoExtended(Item item) {
+        List<Comment> comments = commentRepository.findAllByItem(item);
+        return itemDtoMapper.toDtoExtended(item, comments);
+    }
+
+    private ItemDtoOutExtended formDtoExtendedWithBookings(Item item) {
+        List<Comment> comments = commentRepository.findAllByItem(item);
+        LocalDateTime now = LocalDateTime.now();
+        Booking lastBooking = bookingRepository
+                .findFirstByItemAndStartBefore(item, now, Sort.by(Sort.Direction.DESC, "start"))
+                .orElse(null);
+        Booking nextBooking = bookingRepository
+                .findFirstByItemAndStartAfter(item, now, Sort.by(Sort.Direction.DESC, "start"))
+                .orElse(null);
+        return itemDtoMapper.toDtoExtended(item, comments, lastBooking, nextBooking);
     }
 }
