@@ -12,9 +12,6 @@ import ru.practicum.shareit.exception.CustomValidationException;
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-bookings.
- */
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
