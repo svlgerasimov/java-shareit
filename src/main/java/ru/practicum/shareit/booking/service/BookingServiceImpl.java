@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
@@ -80,24 +81,28 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime now = LocalDateTime.now();
         switch (state) {
             case PAST:
-                bookings = bookingRepository.findByBookerAndEndIsBeforeOrderByStartDesc(booker, now);
+                bookings = bookingRepository.findByBookerAndEndIsBefore(booker, now,
+                        Sort.by(Sort.Direction.DESC, "start"));
                 break;
             case FUTURE:
-                bookings = bookingRepository.findByBookerAndStartIsAfterOrderByStartDesc(booker, now);
+                bookings = bookingRepository.findByBookerAndStartIsAfter(booker, now,
+                        Sort.by(Sort.Direction.DESC, "start"));
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByBookerAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-                        booker, now, now);
+                bookings = bookingRepository.findByBookerAndStartIsBeforeAndEndIsAfter(
+                        booker, now, now, Sort.by(Sort.Direction.DESC, "start"));
                 break;
             case WAITING:
-                bookings = bookingRepository.findByBookerAndStatusIsOrderByStartDesc(booker, BookingStatus.WAITING);
+                bookings = bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.WAITING,
+                        Sort.by(Sort.Direction.DESC, "start"));
                 break;
             case REJECTED:
-                bookings = bookingRepository.findByBookerAndStatusIsOrderByStartDesc(booker, BookingStatus.REJECTED);
+                bookings = bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.REJECTED,
+                        Sort.by(Sort.Direction.DESC, "start"));
                 break;
             case ALL:
             default:
-                bookings = bookingRepository.findByBookerOrderByStartDesc(booker);
+                bookings = bookingRepository.findByBooker(booker, Sort.by(Sort.Direction.DESC, "start"));
                 break;
         }
         return bookingDtoMapper.toDto(bookings);
@@ -110,24 +115,28 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime now = LocalDateTime.now();
         switch (state) {
             case PAST:
-                bookings = bookingRepository.findByItemOwnerAndEndIsBeforeOrderByStartDesc(owner, now);
+                bookings = bookingRepository.findByItemOwnerAndEndIsBefore(owner, now,
+                        Sort.by(Sort.Direction.DESC, "start"));
                 break;
             case FUTURE:
-                bookings = bookingRepository.findByItemOwnerAndStartIsAfterOrderByStartDesc(owner, now);
+                bookings = bookingRepository.findByItemOwnerAndStartIsAfter(owner, now,
+                        Sort.by(Sort.Direction.DESC, "start"));
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByItemOwnerAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-                        owner, now, now);
+                bookings = bookingRepository.findByItemOwnerAndStartIsBeforeAndEndIsAfter(
+                        owner, now, now, Sort.by(Sort.Direction.DESC, "start"));
                 break;
             case WAITING:
-                bookings = bookingRepository.findByItemOwnerAndStatusIsOrderByStartDesc(owner, BookingStatus.WAITING);
+                bookings = bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.WAITING,
+                        Sort.by(Sort.Direction.DESC, "start"));
                 break;
             case REJECTED:
-                bookings = bookingRepository.findByItemOwnerAndStatusIsOrderByStartDesc(owner, BookingStatus.REJECTED);
+                bookings = bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.REJECTED,
+                        Sort.by(Sort.Direction.DESC, "start"));
                 break;
             case ALL:
             default:
-                bookings = bookingRepository.findByItemOwnerOrderByStartDesc(owner);
+                bookings = bookingRepository.findByItemOwner(owner, Sort.by(Sort.Direction.DESC, "start"));
                 break;
         }
         return bookingDtoMapper.toDto(bookings);

@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -79,10 +80,10 @@ public class ItemServiceImpl implements ItemService {
         List<Comment> comments = commentRepository.findAllByItem(item);
         LocalDateTime now = LocalDateTime.now();
         Booking lastBooking = bookingRepository
-                .findFirstByItemAndStartBeforeOrderByStartDesc(item, now)
+                .findFirstByItemAndStartBefore(item, now, Sort.by(Sort.Direction.DESC, "start"))
                 .orElse(null);
         Booking nextBooking = bookingRepository
-                .findFirstByItemAndStartAfterOrderByStartDesc(item, now)
+                .findFirstByItemAndStartAfter(item, now, Sort.by(Sort.Direction.DESC, "start"))
                 .orElse(null);
         return itemDtoMapper.toDtoExtended(item, comments, lastBooking, nextBooking);
     }
