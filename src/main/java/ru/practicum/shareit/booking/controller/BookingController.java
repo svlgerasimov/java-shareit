@@ -39,14 +39,14 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoOut> findByBooker(
-            @RequestParam(required = false, defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "ALL") String state,
             @RequestHeader("X-Sharer-User-Id") long userId) {
         return bookingService.findByBooker(userId, BookingSearchState.of(state));
     }
 
     @GetMapping("/owner")
     public List<BookingDtoOut> findByOwner(
-            @RequestParam(required = false, defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "ALL") String state,
             @RequestHeader("X-Sharer-User-Id") long userId) {
         return bookingService.findByOwner(userId, BookingSearchState.of(state));
     }
