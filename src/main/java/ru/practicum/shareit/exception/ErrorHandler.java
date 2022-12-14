@@ -3,6 +3,7 @@ package ru.practicum.shareit.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,12 +63,15 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
-        Map<String, String> result = exception.getFieldErrors().stream()
+        Map<String, String> result = exception.getAllErrors().stream()
                 .collect(Collectors.toMap(
-                        fieldError ->
-                                "Validation Error in field '" + fieldError.getField() +
-                                        "' with value = '" + fieldError.getRejectedValue() + "'",
-                        fieldError -> Objects.requireNonNullElse(fieldError.getDefaultMessage(), "")));
+                        objectError ->
+                                objectError instanceof FieldError ?
+                                        "Validation error in field " + ((FieldError) objectError).getField() +
+                                                " with value " + ((FieldError) objectError).getRejectedValue() :
+                                        "Validation Error in " + objectError.getObjectName(),
+                        objectError -> Objects.requireNonNullElse(objectError.getDefaultMessage(), "")
+                ));
         log.warn(String.valueOf(result), exception);
         return result;
     }

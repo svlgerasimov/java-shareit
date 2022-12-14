@@ -25,9 +25,6 @@ public class BookingController {
     @PostMapping
     public BookingDtoOut add(@RequestBody @Valid BookingDtoIn bookingDto,
                              @RequestHeader("X-Sharer-User-Id") long userId) {
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
-            throw new CustomValidationException("End time should be later than start time");
-        }
         return bookingService.add(bookingDto, userId);
     }
 
