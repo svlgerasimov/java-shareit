@@ -82,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.groupingBy(Comment::getItem, Collectors.toList()));
 
         LocalDateTime now = LocalDateTime.now();
-        List<Booking> lastBookings = bookingRepository.findAllByItemInAndStartBeforeAndStatusIs(
+        List<Booking> lastBookings = bookingRepository.findAllByItemInAndStartLessThanEqualAndStatusIs(
                 items, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"));
         Map<Item, Booking> lastBookingsByItems = lastBookings.stream()
                 .collect(Collectors.toMap(Booking::getItem, Function.identity(), (booking1, booking2) -> booking1));
@@ -139,7 +139,7 @@ public class ItemServiceImpl implements ItemService {
     private ItemDtoOutExtended formDtoExtendedWithBookings(Item item) {
         LocalDateTime now = LocalDateTime.now();
         Booking lastBooking = bookingRepository
-                .findFirstByItemAndStartBeforeAndStatusIs(
+                .findFirstByItemAndStartLessThanEqualAndStatusIs(
                         item, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
                 .orElse(null);
         Booking nextBooking = bookingRepository
