@@ -39,7 +39,6 @@ public class UserServiceImpl implements UserService {
                         () -> new NotFoundException("User with id=" + id + " not found")
                 );
         userPatchDtoMapper.updateWithPatchDto(user, patchDto);
-        user = userRepository.save(user);
         log.debug("Patch user " + user);
         return userDtoMapper.toDto(user);
     }

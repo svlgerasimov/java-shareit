@@ -59,7 +59,6 @@ public class ItemServiceImpl implements ItemService {
             throw new AuthenticationErrorException("User id=" + userId + " is not owner of item id=" + itemId);
         }
         itemPatchDtoMapper.updateWithPatchDto(item, dto);
-        item = itemRepository.save(item);
         log.debug("Patch item " + item);
         return itemDtoMapper.toDto(item);
     }

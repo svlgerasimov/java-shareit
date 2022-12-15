@@ -61,7 +61,6 @@ public class BookingServiceImpl implements BookingService {
             throw new CustomValidationException("Booking already has been approved/rejected");
         }
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        booking = bookingRepository.save(booking);
         log.debug("Approved booking " + booking);
         return bookingDtoMapper.toDto(booking);
     }
