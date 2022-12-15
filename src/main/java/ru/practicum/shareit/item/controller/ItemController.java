@@ -2,11 +2,11 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,12 +17,13 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/{id}")
-    public ItemDto getById(@PathVariable long id) {
-        return itemService.getById(id);
+    public ItemDtoOutExtended getById(@PathVariable long id,
+                                      @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.getById(id, userId);
     }
 
     @GetMapping
-    public List<ItemDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDtoOutExtended> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getAll(userId);
     }
 
@@ -32,15 +33,22 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto add(@RequestBody @Validated(ItemDto.FullValidated.class) ItemDto itemDto,
+    public ItemDto add(@RequestBody @Valid ItemDto itemDto,
                        @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.add(itemDto, userId);
     }
 
     @PatchMapping("/{id}")
     public ItemDto patch(@PathVariable long id,
-                         @RequestBody @Validated(ItemDto.PatchValidated.class) ItemDto patchDto,
+                         @RequestBody @Valid ItemPatchDto patchDto,
                          @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.patch(id, patchDto, userId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDtoOut addComment(@RequestBody @Valid CommentDtoIn dto,
+                                    @PathVariable long itemId,
+                                    @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.addComment(dto, itemId, userId);
     }
 }
