@@ -12,11 +12,9 @@ import java.time.LocalDateTime;
 @BookingStartBeforeEnd
 public class BookingDtoIn {
 
-    @NotNull
     @FutureOrPresent
     LocalDateTime start;
 
-    @NotNull
     @Future
     LocalDateTime end;
 
