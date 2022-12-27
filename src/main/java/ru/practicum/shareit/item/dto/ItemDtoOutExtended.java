@@ -11,6 +11,7 @@ public class ItemDtoOutExtended {
     String name;
     String description;
     Boolean available;
+    Long requestId;
     BookingDtoShort lastBooking;
     BookingDtoShort nextBooking;
     List<CommentDtoOut> comments;
