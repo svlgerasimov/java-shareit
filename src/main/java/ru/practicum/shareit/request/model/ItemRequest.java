@@ -3,11 +3,13 @@ package ru.practicum.shareit.request.model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "requests")
@@ -27,6 +29,10 @@ public class ItemRequest {
     private User requestor;
 
     private LocalDateTime created;
+
+    @OneToMany(mappedBy = "request", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Item> items;
 
     @Override
     public boolean equals(Object o) {

@@ -17,12 +17,15 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final ItemDtoMapper itemDtoMapper;
     private final ItemPatchDtoMapper itemPatchDtoMapper;
     private final CommentDtoMapper commentDtoMapper;
@@ -44,8 +48,11 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemDto add(ItemDto dto, long userId) {
         User owner = getUser(userId);
+        Long itemRequestId = dto.getRequestId();
+        ItemRequest itemRequest = Objects.isNull(itemRequestId) ? null : getItemRequest(itemRequestId);
         Item item = itemDtoMapper.fromDto(dto);
         item.setOwner(owner);
+        item.setRequest(itemRequest);
         item = itemRepository.save(item);
         log.debug("Add item " + item);
         return itemDtoMapper.toDto(item);
@@ -128,6 +135,11 @@ public class ItemServiceImpl implements ItemService {
     private User getUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+    }
+
+    private ItemRequest getItemRequest(long requestId) {
+        return itemRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Item request with id=" + requestId + " not found"));
     }
 
     private ItemDtoOutExtended formDtoExtended(Item item) {
