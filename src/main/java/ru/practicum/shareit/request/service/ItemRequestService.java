@@ -9,9 +9,9 @@ import java.util.List;
 public interface ItemRequestService {
     ItemRequestDtoOut add(ItemRequestDtoIn dto, long userId);
 
-    ItemRequestDtoOutExtended findById(long id);
+    ItemRequestDtoOutExtended findById(long id, long userId);
 
     List<ItemRequestDtoOutExtended> findByRequestor(long requestorId);
 
-    List<ItemRequestDtoOutExtended> findByOtherUsers(long userId, Long from, Integer size);
+    List<ItemRequestDtoOutExtended> findByOtherUsers(long userId, long from, Integer size);
 }

@@ -19,6 +19,7 @@ import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -43,7 +44,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public ItemRequestDtoOutExtended findById(long id) {
+    public ItemRequestDtoOutExtended findById(long id, long userId) {
+        getUser(userId);
         return itemRequestDtoMapper.toExtendedDto(getItemRequest(id));
     }
 
@@ -57,13 +59,15 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDtoOutExtended> findByOtherUsers(long userId, Long from, Integer size) {
+    public List<ItemRequestDtoOutExtended> findByOtherUsers(long userId, long from, Integer size) {
         User exceptedRequestor = getUser(userId);
-//        Pageable pageable = Objects.isNull(size) ? Pageable.unpaged()
-        return itemRequestDtoMapper.toExtendedDto(
-                itemRequestRepository.findAllByRequestorIsNot(exceptedRequestor,
-                        PageRequest.of((int)(from / size), size, Sort.Direction.DESC, "created"))
-        );
+        Sort sort = Sort.by(Sort.Direction.DESC, "created");
+        List<ItemRequest> itemRequests =
+                Objects.isNull(size) ?
+                        itemRequestRepository.findAllByRequestorIsNot(exceptedRequestor, sort) :
+                        itemRequestRepository.findAllByRequestorIsNot(exceptedRequestor,
+                                PageRequest.of((int) (from / size), size, sort));
+        return itemRequestDtoMapper.toExtendedDto(itemRequests);
     }
 
     private ItemRequest getItemRequest(long requestId) {

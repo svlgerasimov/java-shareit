@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,9 +82,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoOutExtended> getAll(long userId) {
+    public List<ItemDtoOutExtended> getAll(long userId, long from, Integer size) {
         User owner = getUser(userId);
-        List<Item> items = itemRepository.findAllByOwner(owner, Sort.by(Sort.Direction.ASC, "id"));
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        List<Item> items = Objects.isNull(size) ? itemRepository.findAllByOwner(owner, sort) :
+                itemRepository.findAllByOwner(owner, PageRequest.of((int) (from / size), size, sort));
         List<Comment> comments = commentRepository.findAllByItemIn(items);
         Map<Item, List<Comment>> commentsByItems = comments.stream()
                 .collect(Collectors.groupingBy(Comment::getItem, Collectors.toList()));
@@ -104,8 +108,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text) {
-        return itemRepository.search(text.toLowerCase()).stream()
+    public List<ItemDto> search(String text, long from, Integer size) {
+        Pageable pageable = Objects.isNull(size) ? Pageable.unpaged() : PageRequest.of((int) (from / size), size);
+        return itemRepository.search(text.toLowerCase(), pageable).stream()
                 .map(itemDtoMapper::toDto)
                 .collect(Collectors.toList());
     }
