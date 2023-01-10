@@ -133,6 +133,13 @@ class UserServiceImplTest {
     }
 
     @Test
+    void removeWithCorrectIdAndThenNotThrowException() {
+        long id = 1;
+        assertDoesNotThrow(() -> userService.remove(id));
+        Mockito.verify(userRepository).deleteById(id);
+    }
+
+    @Test
     void removeWithAbsentIdAndThenThrowNotFoundException() {
         long id = 1;
         Mockito.doThrow(EmptyResultDataAccessException.class)
