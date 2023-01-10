@@ -120,6 +120,14 @@ class ItemControllerTest {
     }
 
     @Test
+    void getByIdWithoutUserHeaderAndThenStatusBadRequest() throws Exception {
+        mvc.perform(get("/items/{id}", itemBuilder.id()))
+                .andExpect(status().isBadRequest());
+
+        verify(itemService, never()).getById(anyLong(), anyLong());
+    }
+
+    @Test
     void getAllWithPaginationParamsAndThenStatusOkAndJsonArrayBody() throws Exception {
         long userId = 1001L;
         ItemDtoOutExtended expectedDto = itemBuilder.buildDtoExtended();
