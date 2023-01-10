@@ -12,10 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.item.dto.CommentDtoIn;
-import ru.practicum.shareit.item.dto.CommentDtoOut;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoOutExtended;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.nio.charset.StandardCharsets;
@@ -24,8 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -259,7 +255,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void addWithCorrectDtoAndThenStatusOkAndJsonBody() throws Exception {
+    void addValidDtoAndThenStatusOkAndJsonBody() throws Exception {
         long userId = 1001L;
         ItemDto expectedDto = itemBuilder.buildDto();
         itemBuilder.id(null);
@@ -279,10 +275,192 @@ class ItemControllerTest {
     }
 
     @Test
-    void patch() {
+    void addDtoWithBlankNameAndThenStatusBadRequest() throws Exception {
+        long userId = 1001L;
+        itemBuilder.id(null).name("   ");
+        ItemDto inputDto = itemBuilder.buildDto();
+
+        mvc.perform(post("/items")
+                        .content(objectMapper.writeValueAsString(inputDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isBadRequest());
+
+        verify(itemService, never()).add(any(), anyLong());
     }
 
     @Test
-    void addComment() {
+    void addDtoWithBlankDescriptionAndThenStatusBadRequest() throws Exception {
+        long userId = 1001L;
+        itemBuilder.id(null).description("   ");
+        ItemDto inputDto = itemBuilder.buildDto();
+
+        mvc.perform(post("/items")
+                        .content(objectMapper.writeValueAsString(inputDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isBadRequest());
+
+        verify(itemService, never()).add(any(), anyLong());
+    }
+
+    @Test
+    void addDtoWithNullAvailableAndThenStatusBadRequest() throws Exception {
+        long userId = 1001L;
+        itemBuilder.id(null).available(null);
+        ItemDto inputDto = itemBuilder.buildDto();
+
+        mvc.perform(post("/items")
+                        .content(objectMapper.writeValueAsString(inputDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isBadRequest());
+
+        verify(itemService, never()).add(any(), anyLong());
+    }
+
+    @Test
+    void patchWithAvailableAndThenStatusOkAndJsonBody() throws Exception {
+        itemBuilder.available(true);
+        long itemId = itemBuilder.id();
+        long userId = 1001L;
+        ItemDto expectedDto = itemBuilder.buildDto();
+        ItemPatchDto patchDto = new ItemPatchDto(null, null, itemBuilder.available());
+
+        when(itemService.patch(itemId, patchDto, userId))
+                .thenReturn(expectedDto);
+
+        mvc.perform(patch("/items/{id}", itemId)
+                        .content(objectMapper.writeValueAsString(patchDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedDto)));
+    }
+
+    @Test
+    void patchWithValidNameAndThenStatusOkAndJsonBody() throws Exception {
+        itemBuilder.name("name");
+        long itemId = itemBuilder.id();
+        long userId = 1001L;
+        ItemDto expectedDto = itemBuilder.buildDto();
+        ItemPatchDto patchDto = new ItemPatchDto(itemBuilder.name(), null, null);
+
+        when(itemService.patch(itemId, patchDto, userId))
+                .thenReturn(expectedDto);
+
+        mvc.perform(patch("/items/{id}", itemId)
+                        .content(objectMapper.writeValueAsString(patchDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedDto)));
+
+    }
+
+    @Test
+    void patchWithBlankNameAndThenStatusOkAndJsonBody() throws Exception {
+        itemBuilder.name("  ");
+        long itemId = itemBuilder.id();
+        long userId = 1001L;
+        ItemPatchDto patchDto = new ItemPatchDto(itemBuilder.name(), null, null);
+
+        mvc.perform(patch("/items/{id}", itemId)
+                        .content(objectMapper.writeValueAsString(patchDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isBadRequest());
+
+        verify(itemService, never()).patch(anyLong(), any(), anyLong());
+    }
+
+    @Test
+    void patchWithValidDescriptionAndThenStatusOkAndJsonBody() throws Exception {
+        itemBuilder.description("description");
+        long itemId = itemBuilder.id();
+        long userId = 1001L;
+        ItemDto expectedDto = itemBuilder.buildDto();
+        ItemPatchDto patchDto = new ItemPatchDto(null, itemBuilder.description(), null);
+
+        when(itemService.patch(itemId, patchDto, userId))
+                .thenReturn(expectedDto);
+
+        mvc.perform(patch("/items/{id}", itemId)
+                        .content(objectMapper.writeValueAsString(patchDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedDto)));
+
+    }
+
+    @Test
+    void patchWithBlankDescriptionAndThenStatusOkAndJsonBody() throws Exception {
+        itemBuilder.description("  ");
+        long itemId = itemBuilder.id();
+        long userId = 1001L;
+        ItemPatchDto patchDto = new ItemPatchDto(null, itemBuilder.description, null);
+
+        mvc.perform(patch("/items/{id}", itemId)
+                        .content(objectMapper.writeValueAsString(patchDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isBadRequest());
+
+        verify(itemService, never()).patch(anyLong(), any(), anyLong());
+    }
+
+    @Test
+    void addCommentWithValidDtoAndThenStatusOkAndJsonBody() throws Exception {
+        CommentDtoIn inputDto = commentBuilder.buildDtoIn();
+        CommentDtoOut expectedDto = commentBuilder.buildDtoOut();
+        long itemId = 1001L;
+        long userId = 1011L;
+
+        when(itemService.addComment(inputDto, itemId, userId))
+                .thenReturn(expectedDto);
+
+        mvc.perform(post("/items/{itemId}/comment", itemId)
+                        .content(objectMapper.writeValueAsString(inputDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedDto)));
+    }
+
+    @Test
+    void addCommentWithBlankTextAndThenStatusBadRequest() throws Exception {
+        commentBuilder.text("   ");
+        CommentDtoIn inputDto = commentBuilder.buildDtoIn();
+        long itemId = 1001L;
+        long userId = 1011L;
+
+        mvc.perform(post("/items/{itemId}/comment", itemId)
+                        .content(objectMapper.writeValueAsString(inputDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isBadRequest());
+
+        verify(itemService, never()).addComment(any(), anyLong(), anyLong());
     }
 }
