@@ -89,7 +89,7 @@ class BookingServiceImplTest {
             return new BookingDtoIn(start, end, itemId);
         }
 
-        public BookingDtoOut buildDtoOut(){
+        public BookingDtoOut buildDtoOut() {
             return new BookingDtoOut(id, start, end,
                     new ItemDto(itemId, null, null, itemAvailable, null),
                     new UserDto(bookerId, null, null),

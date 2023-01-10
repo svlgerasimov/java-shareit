@@ -134,7 +134,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case FUTURE:
                 bookings = Objects.isNull(size) ?
-                        bookingRepository.findByItemOwnerAndStartIsAfter(owner, now, sort):
+                        bookingRepository.findByItemOwnerAndStartIsAfter(owner, now, sort) :
                         bookingRepository.findByItemOwnerAndStartIsAfter(owner, now, formPageable(from, size, sort));
                 break;
             case CURRENT:

@@ -89,8 +89,8 @@ class BookingControllerTest {
         BookingDtoIn inputDto = bookingBuilder.buildDtoIn();
         BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
 
-        when(bookingService.add(inputDto, bookingBuilder.bookerId())).
-                thenReturn(expectedDto);
+        when(bookingService.add(inputDto, bookingBuilder.bookerId()))
+                .thenReturn(expectedDto);
 
         mvc.perform(post("/bookings")
                         .content(objectMapper.writeValueAsString(inputDto))

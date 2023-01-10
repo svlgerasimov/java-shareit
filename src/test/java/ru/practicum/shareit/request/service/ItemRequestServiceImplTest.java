@@ -222,7 +222,7 @@ class ItemRequestServiceImplTest {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class,
-                () -> itemRequestService.findById(2L ,1L));
+                () -> itemRequestService.findById(2L, 1L));
     }
 
     @Test
@@ -230,8 +230,8 @@ class ItemRequestServiceImplTest {
         TestRequestBuilder requestBuilder = TestRequestBuilder.defaultBuilder();
         ItemRequest entity = requestBuilder.buildEntity();
 
-        Mockito.when(userRepository.findById(entity.getRequestor().getId())).
-                thenReturn(Optional.of(entity.getRequestor()));
+        Mockito.when(userRepository.findById(entity.getRequestor().getId()))
+                .thenReturn(Optional.of(entity.getRequestor()));
         Mockito.when(itemRequestRepository.findAllByRequestor(Mockito.any(), Mockito.any()))
                 .thenReturn(List.of());
 

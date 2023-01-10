@@ -543,7 +543,7 @@ class ItemServiceImplTest {
         long userId = 1L;
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> itemService.getAll(userId, 0 , 1));
+        assertThrows(NotFoundException.class, () -> itemService.getAll(userId, 0, 1));
     }
 
     @Test
