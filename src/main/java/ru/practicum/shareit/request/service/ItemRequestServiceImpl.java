@@ -39,7 +39,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         request.setRequestor(requestor);
         request.setCreated(LocalDateTime.now());
         request = itemRequestRepository.save(request);
-        log.debug("Add item request: " + request);
+        log.debug("Add item request {}", request);
         return itemRequestDtoMapper.toDto(request);
     }
 

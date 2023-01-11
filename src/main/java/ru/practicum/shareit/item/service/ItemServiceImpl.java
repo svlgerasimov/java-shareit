@@ -56,7 +56,7 @@ public class ItemServiceImpl implements ItemService {
         item.setOwner(owner);
         item.setRequest(itemRequest);
         item = itemRepository.save(item);
-        log.debug("Add item " + item);
+        log.debug("Add item {}", item);
         return itemDtoMapper.toDto(item);
     }
 
@@ -68,7 +68,7 @@ public class ItemServiceImpl implements ItemService {
             throw new AuthenticationErrorException("User id=" + userId + " is not owner of item id=" + itemId);
         }
         itemPatchDtoMapper.updateWithPatchDto(item, dto);
-        log.debug("Patch item " + item);
+        log.debug("Patch item {}", item);
         return itemDtoMapper.toDto(item);
     }
 
@@ -128,7 +128,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
         comment = commentRepository.save(comment);
-        log.debug("Add comment: " + comment);
+        log.debug("Add comment {}", comment);
         return commentDtoMapper.toDto(comment);
     }
 

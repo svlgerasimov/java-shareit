@@ -49,7 +49,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setBooker(booker);
         booking.setItem(item);
         booking = bookingRepository.save(booking);
-        log.debug("Add booking " + booking);
+        log.debug("Add booking {}", booking);
         return bookingDtoMapper.toDto(booking);
     }
 
@@ -63,7 +63,7 @@ public class BookingServiceImpl implements BookingService {
             throw new CustomValidationException("Booking already has been approved/rejected");
         }
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        log.debug("Approved booking " + booking);
+        log.debug("Approved booking {}", booking);
         return bookingDtoMapper.toDto(booking);
     }
 
