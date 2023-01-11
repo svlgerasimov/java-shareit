@@ -88,22 +88,24 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items = Objects.isNull(size) ? itemRepository.findAllByOwner(owner, sort) :
                 itemRepository.findAllByOwner(owner, PageRequest.of((int) (from / size), size, sort));
         List<Comment> comments = commentRepository.findAllByItemIn(items);
-        Map<Item, List<Comment>> commentsByItems = comments.stream()
-                .collect(Collectors.groupingBy(Comment::getItem, Collectors.toList()));
+        Map<Long, List<Comment>> commentsByItemIds = comments.stream()
+                .collect(Collectors.groupingBy(comment -> comment.getItem().getId(), Collectors.toList()));
 
         LocalDateTime now = LocalDateTime.now();
         List<Booking> lastBookings = bookingRepository.findAllByItemInAndStartLessThanEqualAndStatusIs(
                 items, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"));
-        Map<Item, Booking> lastBookingsByItems = lastBookings.stream()
-                .collect(Collectors.toMap(Booking::getItem, Function.identity(), (booking1, booking2) -> booking1));
+        Map<Long, Booking> lastBookingsByItemIds = lastBookings.stream()
+                .collect(Collectors.toMap(booking -> booking.getItem().getId(), Function.identity(),
+                        (booking1, booking2) -> booking1));
         List<Booking> nextBookings = bookingRepository.findAllByItemInAndStartAfterAndStatusIs(
                 items, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "start"));
-        Map<Item, Booking> nextBookingsByItems = nextBookings.stream()
-                .collect(Collectors.toMap(Booking::getItem, Function.identity(), (booking1, booking2) -> booking1));
+        Map<Long, Booking> nextBookingsByItemIds = nextBookings.stream()
+                .collect(Collectors.toMap(booking -> booking.getItem().getId(), Function.identity(),
+                        (booking1, booking2) -> booking1));
 
         return items.stream()
-                .map(item -> itemDtoMapper.toDtoExtended(item, commentsByItems.get(item),
-                        lastBookingsByItems.get(item), nextBookingsByItems.get(item)))
+                .map(item -> itemDtoMapper.toDtoExtended(item, commentsByItemIds.get(item.getId()),
+                        lastBookingsByItemIds.get(item.getId()), nextBookingsByItemIds.get(item.getId())))
                 .collect(Collectors.toList());
     }
 
