@@ -8,6 +8,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDtoIn;
 import ru.practicum.shareit.request.dto.ItemRequestDtoMapper;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
@@ -19,7 +21,9 @@ import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -28,6 +32,7 @@ import java.util.Objects;
 public class ItemRequestServiceImpl implements ItemRequestService {
 
     private final ItemRequestRepository itemRequestRepository;
+    private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final ItemRequestDtoMapper itemRequestDtoMapper;
 
@@ -46,16 +51,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestDtoOutExtended findById(long id, long userId) {
         getUser(userId);
-        return itemRequestDtoMapper.toExtendedDto(getItemRequest(id));
+        ItemRequest itemRequest = getItemRequest(id);
+        List<Item> items = itemRepository.findAllByRequest(itemRequest);
+        return itemRequestDtoMapper.toExtendedDto(itemRequest, items);
     }
 
     @Override
     public List<ItemRequestDtoOutExtended> findByRequestor(long requestorId) {
         User requestor = getUser(requestorId);
-        return itemRequestDtoMapper.toExtendedDto(
-                itemRequestRepository.findAllByRequestor(requestor,
-                        Sort.by(Sort.Direction.DESC, "created"))
-        );
+        List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequestor(requestor,
+                Sort.by(Sort.Direction.DESC, "created"));
+        List<Item> items = itemRepository.findAllByRequestIn(itemRequests);
+        return itemRequestDtoMapper.toExtendedDto(itemRequests, formItemsByRequestIds(items));
     }
 
     @Override
@@ -67,7 +74,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                         itemRequestRepository.findAllByRequestorIsNot(exceptedRequestor, sort) :
                         itemRequestRepository.findAllByRequestorIsNot(exceptedRequestor,
                                 PageRequest.of((int) (from / size), size, sort));
-        return itemRequestDtoMapper.toExtendedDto(itemRequests);
+        List<Item> items = itemRepository.findAllByRequestIn(itemRequests);
+        return itemRequestDtoMapper.toExtendedDto(itemRequests, formItemsByRequestIds(items));
     }
 
     private ItemRequest getItemRequest(long requestId) {
@@ -80,5 +88,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
     }
 
-
+    private Map<Long, List<Item>> formItemsByRequestIds(List<Item> allItems) {
+        return allItems.stream()
+                .collect(Collectors.groupingBy(item -> item.getRequest().getId(), Collectors.toList()));
+    }
 }

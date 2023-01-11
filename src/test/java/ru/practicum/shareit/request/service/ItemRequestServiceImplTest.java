@@ -23,6 +23,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoMapper;
 import ru.practicum.shareit.item.dto.ItemDtoMapperImpl;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.request.dto.*;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.storage.ItemRequestRepository;
@@ -42,6 +43,8 @@ class ItemRequestServiceImplTest {
     private ItemRequestRepository itemRequestRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ItemRepository itemRepository;
     @Spy
     private static ItemRequestDtoMapper itemRequestDtoMapper = new ItemRequestDtoMapperImpl();
 
@@ -65,14 +68,18 @@ class ItemRequestServiceImplTest {
             User requestor = new User();
             requestor.setId(requestorId);
             request.setRequestor(requestor);
+//            request.setItems(Set.of(item1));
+            return request;
+        }
+
+        public List<Item> buildItems(ItemRequest request) {
             Item item1 = new Item();
             item1.setId(itemId1);
             User owner1 = new User();
             owner1.setId(itemOwnerId1);
             item1.setOwner(owner1);
             item1.setRequest(request);
-            request.setItems(Set.of(item1));
-            return request;
+            return List.of(item1);
         }
 
         public ItemRequestDtoOut buildDtoOut() {
@@ -149,6 +156,12 @@ class ItemRequestServiceImplTest {
                 .thenReturn(Optional.of(user));
         Mockito.lenient().when(itemRequestRepository.findById(entity.getId()))
                 .thenReturn(Optional.of(entity));
+        Mockito.lenient().when(itemRepository.findAllByRequest(Mockito.argThat(itemRequest ->
+                        Objects.nonNull(itemRequest) &&
+                        Objects.nonNull(itemRequest.getId()) &
+                        Objects.equals(itemRequest.getDescription(), entity.getDescription()) &&
+                        Objects.equals(itemRequest.getCreated(), entity.getCreated()))))
+                .thenReturn(requestBuilder.buildItems(entity));
 
         assertEquals(dto, itemRequestService.findById(entity.getId(), userId));
     }
@@ -206,6 +219,13 @@ class ItemRequestServiceImplTest {
                 .thenReturn(Optional.of(requestor));
         Mockito.when(itemRequestRepository.findAllByRequestor(Mockito.any(), Mockito.any()))
                 .thenReturn(List.of(entity));
+        Mockito.when(itemRepository.findAllByRequestIn(Mockito.argThat(itemRequestList ->
+                        Objects.nonNull(itemRequestList) &&
+                        itemRequestList.size() == 1 &&
+                        Objects.nonNull(itemRequestList.get(0).getId()) &&
+                        Objects.equals(itemRequestList.get(0).getDescription(), entity.getDescription()) &&
+                        Objects.equals(itemRequestList.get(0).getCreated(), entity.getCreated()))))
+                .thenReturn(requestBuilder.buildItems(entity));
 
         assertEquals(List.of(dto), itemRequestService.findByRequestor(requestorId));
 
@@ -254,6 +274,13 @@ class ItemRequestServiceImplTest {
                         Objects.equals(requestor.getId(), userId)),
                 Mockito.eq(sort)))
                 .thenReturn(List.of(entity));
+        Mockito.when(itemRepository.findAllByRequestIn(Mockito.argThat(itemRequestList ->
+                        Objects.nonNull(itemRequestList) &&
+                                itemRequestList.size() == 1 &&
+                                Objects.nonNull(itemRequestList.get(0).getId()) &&
+                                Objects.equals(itemRequestList.get(0).getDescription(), entity.getDescription()) &&
+                                Objects.equals(itemRequestList.get(0).getCreated(), entity.getCreated()))))
+                .thenReturn(requestBuilder.buildItems(entity));
 
         assertEquals(List.of(requestBuilder.buildDtoOutExtended()),
                 itemRequestService.findByOtherUsers(userId, 0, null));
@@ -281,6 +308,13 @@ class ItemRequestServiceImplTest {
                                 Objects.equals(requestor.getId(), userId)),
                         Mockito.eq(PageRequest.of(0, 1, sort))))
                 .thenReturn(List.of(entity));
+        Mockito.when(itemRepository.findAllByRequestIn(Mockito.argThat(itemRequestList ->
+                        Objects.nonNull(itemRequestList) &&
+                                itemRequestList.size() == 1 &&
+                                Objects.nonNull(itemRequestList.get(0).getId()) &&
+                                Objects.equals(itemRequestList.get(0).getDescription(), entity.getDescription()) &&
+                                Objects.equals(itemRequestList.get(0).getCreated(), entity.getCreated()))))
+                .thenReturn(requestBuilder.buildItems(entity));
 
         assertEquals(List.of(requestBuilder.buildDtoOutExtended()),
                 itemRequestService.findByOtherUsers(userId, 0, 1));
