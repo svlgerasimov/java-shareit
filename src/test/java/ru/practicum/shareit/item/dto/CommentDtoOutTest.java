@@ -16,6 +16,13 @@ class CommentDtoOutTest {
     @Autowired
     JacksonTester<CommentDtoOut> jacksonTester;
 
+    private final String json = "{\n" +
+            "  \"id\": 1,\n" +
+            "  \"text\": \"text\",\n" +
+            "  \"authorName\": \"Author\",\n" +
+            "  \"created\": \"2001-02-03T04:05:00\"\n" +
+            "}";
+
     private final CommentDtoOut commentDtoOut = new CommentDtoOut(1L,
             "text", "Author",
             LocalDateTime.of(2001, 2, 3, 4, 5));
@@ -23,12 +30,12 @@ class CommentDtoOutTest {
     @Test
     void commentDtoOutSerializationTest() throws IOException {
         assertThat(jacksonTester.write(commentDtoOut))
-                .isEqualToJson("CommentDtoOut.json", JSONCompareMode.STRICT);
+                .isEqualToJson(json, JSONCompareMode.STRICT);
     }
 
     @Test
     void commentDtoOutDeserializationTest() throws IOException {
-        assertThat(jacksonTester.read("CommentDtoOut.json"))
+        assertThat(jacksonTester.parse(json))
                 .usingRecursiveComparison()
                 .isEqualTo(commentDtoOut);
     }

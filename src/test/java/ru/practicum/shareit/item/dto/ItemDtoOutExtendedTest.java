@@ -39,15 +39,57 @@ class ItemDtoOutExtendedTest {
             )
     );
 
+    private final String json = "{\n" +
+            "  \"id\": 1,\n" +
+            "  \"name\": \"name\",\n" +
+            "  \"description\": \"description\",\n" +
+            "  \"available\": true,\n" +
+            "  \"requestId\": 2,\n" +
+            "  \"lastBooking\": {\n" +
+            "    \"id\": 3,\n" +
+            "    \"start\": \"2001-02-03T04:05:00\",\n" +
+            "    \"end\": \"2011-12-13T14:15:00\",\n" +
+            "    \"bookerId\": 4,\n" +
+            "    \"status\": \"APPROVED\"\n" +
+            "  },\n" +
+            "  \"nextBooking\": {\n" +
+            "    \"id\": 5,\n" +
+            "    \"start\": \"2002-01-04T05:06:00\",\n" +
+            "    \"end\": \"2012-11-14T15:16:00\",\n" +
+            "    \"bookerId\": 6,\n" +
+            "    \"status\": \"WAITING\"\n" +
+            "  },\n" +
+            "  \"comments\": [\n" +
+            "    {\n" +
+            "      \"id\": 11,\n" +
+            "      \"text\": \"text1\",\n" +
+            "      \"authorName\": \"Author1\",\n" +
+            "      \"created\": \"2003-04-05T06:07:00\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"id\": 12,\n" +
+            "      \"text\": \"text2\",\n" +
+            "      \"authorName\": \"Author2\",\n" +
+            "      \"created\": \"2004-05-06T07:08:00\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"id\": 13,\n" +
+            "      \"text\": \"text3\",\n" +
+            "      \"authorName\": \"Author3\",\n" +
+            "      \"created\": \"2005-06-07T08:09:00\"\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}";
+
     @Test
     void itemDtoOutExtendedSerializationTest() throws IOException {
         assertThat(jacksonTester.write(itemDtoOutExtended))
-                .isEqualToJson("ItemDtoOutExtended.json", JSONCompareMode.STRICT);
+                .isEqualToJson(json, JSONCompareMode.STRICT);
     }
 
     @Test
     void itemDtoOutExtendedDeserializationTest() throws IOException {
-        assertThat(jacksonTester.read("ItemDtoOutExtended.json"))
+        assertThat(jacksonTester.parse(json))
                 .usingRecursiveComparison()
                 .isEqualTo(itemDtoOutExtended);
     }

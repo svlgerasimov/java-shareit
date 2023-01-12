@@ -15,16 +15,24 @@ class ItemDtoTest {
     @Autowired
     JacksonTester<ItemDto> jacksonTester;
 
+    private final String json = "{\n" +
+            "  \"id\": 1,\n" +
+            "  \"name\": \"name\",\n" +
+            "  \"description\": \"description\",\n" +
+            "  \"available\": true,\n" +
+            "  \"requestId\": 2\n" +
+            "}";
+
     private final ItemDto itemDto = new ItemDto(1L, "name", "description", true, 2L);
 
     @Test
     void itemDtoSerializationTest() throws IOException {
-        assertThat(jacksonTester.write(itemDto)).isEqualToJson("ItemDto.json", JSONCompareMode.STRICT);
+        assertThat(jacksonTester.write(itemDto)).isEqualToJson(json, JSONCompareMode.STRICT);
     }
 
     @Test
     void itemDtoDeserializationTest() throws IOException {
-        assertThat(jacksonTester.read("ItemDto.json"))
+        assertThat(jacksonTester.parse(json))
                 .usingRecursiveComparison()
                 .isEqualTo(itemDto);
     }

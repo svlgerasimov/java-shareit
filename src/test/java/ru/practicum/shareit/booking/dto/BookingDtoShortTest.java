@@ -22,15 +22,23 @@ class BookingDtoShortTest {
             LocalDateTime.of(2011, 12, 13, 14, 15),
             2L, BookingStatus.WAITING);
 
+    private final String json = "{\n" +
+            "  \"id\": 1,\n" +
+            "  \"start\": \"2001-02-03T04:05:00\",\n" +
+            "  \"end\": \"2011-12-13T14:15:00\",\n" +
+            "  \"bookerId\": 2,\n" +
+            "  \"status\": \"WAITING\"\n" +
+            "}";
+
     @Test
     void bookingDtoShortSerializationTest() throws IOException {
         assertThat(jacksonTester.write(bookingDtoShort))
-                .isEqualToJson("bookingDtoShort.json", JSONCompareMode.STRICT);
+                .isEqualToJson(json, JSONCompareMode.STRICT);
     }
 
     @Test
     void bookingDtoShortDeserializationTest() throws IOException {
-        assertThat(jacksonTester.read("bookingDtoShort.json"))
+        assertThat(jacksonTester.parse(json))
                 .usingRecursiveComparison()
                 .isEqualTo(bookingDtoShort);
     }

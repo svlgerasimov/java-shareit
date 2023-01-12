@@ -15,17 +15,23 @@ class UserDtoTest {
     @Autowired
     JacksonTester<UserDto> jacksonTester;
 
+    private final String json = "{\n" +
+            "  \"id\": 1,\n" +
+            "  \"name\": \"name\",\n" +
+            "  \"email\": \"user@mail.com\"\n" +
+            "}";
+
     private final UserDto userDto = new UserDto(1L, "name", "user@mail.com");
 
     @Test
     void userDtoSerializationTest() throws IOException {
         assertThat(jacksonTester.write(userDto))
-                .isEqualToJson("UserDto.json", JSONCompareMode.STRICT);
+                .isEqualToJson(json, JSONCompareMode.STRICT);
     }
 
     @Test
     void userDtoDeserializationTest() throws IOException {
-        assertThat(jacksonTester.read("UserDto.json"))
+        assertThat(jacksonTester.parse(json))
                 .usingRecursiveComparison()
                 .isEqualTo(userDto);
     }

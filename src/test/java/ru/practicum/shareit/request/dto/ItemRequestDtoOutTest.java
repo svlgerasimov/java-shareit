@@ -20,15 +20,21 @@ class ItemRequestDtoOutTest {
             "description",
             LocalDateTime.of(2001, 2, 3, 4, 5));
 
+    private final String json = "{\n" +
+            "  \"id\": 1,\n" +
+            "  \"description\": \"description\",\n" +
+            "  \"created\": \"2001-02-03T04:05:00\"\n" +
+            "}";
+
     @Test
     void itemRequestDtoOutSerializationTest() throws IOException {
         assertThat(jacksonTester.write(itemRequestDtoOut))
-                .isEqualToJson("ItemRequestDtoOut.json", JSONCompareMode.STRICT);
+                .isEqualToJson(json, JSONCompareMode.STRICT);
     }
 
     @Test
     void itemRequestDtoOutDeserializationTest() throws IOException {
-        assertThat(jacksonTester.read("ItemRequestDtoOut.json"))
+        assertThat(jacksonTester.parse(json))
                 .usingRecursiveComparison()
                 .isEqualTo(itemRequestDtoOut);
     }

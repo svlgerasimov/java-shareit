@@ -19,6 +19,25 @@ class BookingDtoOutTest {
     @Autowired
     JacksonTester<BookingDtoOut> jacksonTester;
 
+    private final String json = "{\n" +
+            "  \"id\": 1,\n" +
+            "  \"start\": \"2001-02-03T04:05:00\",\n" +
+            "  \"end\": \"2011-12-13T14:15:00\",\n" +
+            "  \"item\": {\n" +
+            "    \"id\":2,\n" +
+            "    \"name\": \"itemName\",\n" +
+            "    \"description\": \"itemDescription\",\n" +
+            "    \"available\": true,\n" +
+            "    \"requestId\": 3\n" +
+            "  },\n" +
+            "  \"booker\": {\n" +
+            "    \"id\": 4,\n" +
+            "    \"name\": \"userName\",\n" +
+            "    \"email\": \"user@mail.com\"\n" +
+            "  },\n" +
+            "  \"status\": \"WAITING\"\n" +
+            "}";
+
     private final BookingDtoOut bookingDtoOut = new BookingDtoOut(1L,
             LocalDateTime.of(2001, 2, 3, 4, 5),
             LocalDateTime.of(2011, 12, 13, 14, 15),
@@ -29,12 +48,12 @@ class BookingDtoOutTest {
     @Test
     void bookingDtoOutSerializationTest() throws IOException {
         assertThat(jacksonTester.write(bookingDtoOut))
-                .isEqualToJson("bookingDtoOut.json", JSONCompareMode.STRICT);
+                .isEqualToJson(json, JSONCompareMode.STRICT);
     }
 
     @Test
     void bookingDtoOutDeserializationTest() throws IOException {
-        assertThat(jacksonTester.read("bookingDtoOut.json"))
+        assertThat(jacksonTester.parse(json))
                 .usingRecursiveComparison()
                 .isEqualTo(bookingDtoOut);
     }

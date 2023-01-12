@@ -18,6 +18,28 @@ class ItemRequestDtoOutExtendedTest {
     @Autowired
     JacksonTester<ItemRequestDtoOutExtended> jacksonTester;
 
+    private final String json = "{\n" +
+            "  \"id\": 1,\n" +
+            "  \"description\": \"description\",\n" +
+            "  \"created\": \"2001-02-03T04:05:00\",\n" +
+            "  \"items\": [\n" +
+            "    {\n" +
+            "      \"id\": 2,\n" +
+            "      \"name\": \"itemName1\",\n" +
+            "      \"description\": \"itemDescription1\",\n" +
+            "      \"available\": true,\n" +
+            "      \"requestId\": 3\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"id\": 4,\n" +
+            "      \"name\": \"itemName2\",\n" +
+            "      \"description\": \"itemDescription2\",\n" +
+            "      \"available\": false,\n" +
+            "      \"requestId\": 5\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}";
+
     private final ItemRequestDtoOutExtended itemRequestDtoOutExtended = new ItemRequestDtoOutExtended(1L,
             "description",
             LocalDateTime.of(2001, 2, 3, 4, 5),
@@ -27,12 +49,12 @@ class ItemRequestDtoOutExtendedTest {
     @Test
     void itemRequestDtoOutExtendedSerializationTest() throws IOException {
         assertThat(jacksonTester.write(itemRequestDtoOutExtended))
-                .isEqualToJson("ItemRequestDtoOutExtended.json", JSONCompareMode.STRICT);
+                .isEqualToJson(json, JSONCompareMode.STRICT);
     }
 
     @Test
     void itemRequestDtoOutExtendedDeserializationTest() throws IOException {
-        assertThat(jacksonTester.read("ItemRequestDtoOutExtended.json"))
+        assertThat(jacksonTester.parse(json))
                 .usingRecursiveComparison()
                 .isEqualTo(itemRequestDtoOutExtended);
     }
