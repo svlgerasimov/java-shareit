@@ -46,7 +46,7 @@ public class BookingController {
             @RequestParam(defaultValue = "ALL") String state,
             @RequestHeader("X-Sharer-User-Id") long userId,
             @RequestParam(defaultValue = "0") @PositiveOrZero Long from,
-            @RequestParam(required = false) @Positive Integer size) {
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
         return bookingService.findByBooker(userId, BookingSearchState.of(state), from, size);
     }
 
@@ -55,7 +55,7 @@ public class BookingController {
             @RequestParam(defaultValue = "ALL") String state,
             @RequestHeader("X-Sharer-User-Id") long userId,
             @RequestParam(defaultValue = "0") @PositiveOrZero Long from,
-            @RequestParam(required = false) @Positive Integer size) {
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
         return bookingService.findByOwner(userId, BookingSearchState.of(state), from, size);
     }
 }

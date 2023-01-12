@@ -231,7 +231,7 @@ class BookingControllerTest {
         BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
         BookingSearchState searchState = BookingSearchState.WAITING;
 
-        when(bookingService.findByBooker(bookingBuilder.bookerId, searchState, 0, null))
+        when(bookingService.findByBooker(bookingBuilder.bookerId, searchState, 0, 10))
                 .thenReturn(List.of(expectedDto));
 
         mvc.perform(get("/bookings")
@@ -248,7 +248,7 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", bookingBuilder.bookerId()))
                 .andExpect(status().isBadRequest());
 
-        verify(bookingService, never()).findByBooker(anyLong(), any(), anyLong(), any());
+        verify(bookingService, never()).findByBooker(anyLong(), any(), anyLong(), anyInt());
     }
 
     @Test
@@ -259,7 +259,7 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", bookingBuilder.bookerId()))
                 .andExpect(status().isBadRequest());
 
-        verify(bookingService, never()).findByBooker(anyLong(), any(), anyLong(), any());
+        verify(bookingService, never()).findByBooker(anyLong(), any(), anyLong(), anyInt());
     }
 
     @Test
@@ -270,7 +270,7 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", bookingBuilder.bookerId()))
                 .andExpect(status().isBadRequest());
 
-        verify(bookingService, never()).findByBooker(anyLong(), any(), anyLong(), any());
+        verify(bookingService, never()).findByBooker(anyLong(), any(), anyLong(), anyInt());
     }
 
     @Test
@@ -281,7 +281,7 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", bookingBuilder.bookerId()))
                 .andExpect(status().isBadRequest());
 
-        verify(bookingService, never()).findByBooker(anyLong(), any(), anyLong(), any());
+        verify(bookingService, never()).findByBooker(anyLong(), any(), anyLong(), anyInt());
     }
 
     @Test
@@ -308,7 +308,7 @@ class BookingControllerTest {
         BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
         BookingSearchState searchState = BookingSearchState.WAITING;
 
-        when(bookingService.findByOwner(bookingBuilder.itemOwnerId(), searchState, 0, null))
+        when(bookingService.findByOwner(bookingBuilder.itemOwnerId(), searchState, 0, 10))
                 .thenReturn(List.of(expectedDto));
 
         mvc.perform(get("/bookings/owner")
@@ -325,7 +325,7 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", bookingBuilder.itemOwnerId()))
                 .andExpect(status().isBadRequest());
 
-        verify(bookingService, never()).findByOwner(anyLong(), any(), anyLong(), any());
+        verify(bookingService, never()).findByOwner(anyLong(), any(), anyLong(), anyInt());
     }
 
     @Test
@@ -336,7 +336,7 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", bookingBuilder.itemOwnerId()))
                 .andExpect(status().isBadRequest());
 
-        verify(bookingService, never()).findByOwner(anyLong(), any(), anyLong(), any());
+        verify(bookingService, never()).findByOwner(anyLong(), any(), anyLong(), anyInt());
     }
 
     @Test
@@ -347,7 +347,7 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", bookingBuilder.itemOwnerId()))
                 .andExpect(status().isBadRequest());
 
-        verify(bookingService, never()).findByOwner(anyLong(), any(), anyLong(), any());
+        verify(bookingService, never()).findByOwner(anyLong(), any(), anyLong(), anyInt());
     }
 
     @Test
@@ -358,6 +358,6 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", bookingBuilder.itemOwnerId()))
                 .andExpect(status().isBadRequest());
 
-        verify(bookingService, never()).findByOwner(anyLong(), any(), anyLong(), any());
+        verify(bookingService, never()).findByOwner(anyLong(), any(), anyLong(), anyInt());
     }
 }

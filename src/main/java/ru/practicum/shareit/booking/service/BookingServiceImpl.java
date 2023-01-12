@@ -23,7 +23,6 @@ import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -76,90 +75,60 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoOut> findByBooker(long bookerId, BookingSearchState state, long from, Integer size) {
+    public List<BookingDtoOut> findByBooker(long bookerId, BookingSearchState state, long from, int size) {
         User booker = getUser(bookerId);
         List<Booking> bookings;
         LocalDateTime now = LocalDateTime.now();
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+        PageRequest pageable = formPageable(from, size, Sort.by(Sort.Direction.DESC, "start"));
         switch (state) {
             case PAST:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByBookerAndEndIsBefore(booker, now, sort) :
-                        bookingRepository.findByBookerAndEndIsBefore(booker, now, formPageable(from, size, sort));
+                bookings = bookingRepository.findByBookerAndEndIsBefore(booker, now, pageable);
                 break;
             case FUTURE:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByBookerAndStartIsAfter(booker, now, sort) :
-                        bookingRepository.findByBookerAndStartIsAfter(booker, now, formPageable(from, size, sort));
+                bookings = bookingRepository.findByBookerAndStartIsAfter(booker, now, pageable);
                 break;
             case CURRENT:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByBookerAndStartIsBeforeAndEndIsAfter(booker, now, now, sort) :
-                        bookingRepository.findByBookerAndStartIsBeforeAndEndIsAfter(booker, now, now,
-                                formPageable(from, size, sort));
+                bookings = bookingRepository.findByBookerAndStartIsBeforeAndEndIsAfter(booker, now, now, pageable);
                 break;
             case WAITING:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.WAITING, sort) :
-                        bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.WAITING,
-                                formPageable(from, size, sort));
+                bookings = bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.WAITING, pageable);
                 break;
             case REJECTED:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.REJECTED, sort) :
-                        bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.REJECTED,
-                                formPageable(from, size, sort));
+                bookings = bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.REJECTED, pageable);
                 break;
             case ALL:
             default:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByBooker(booker, sort) :
-                        bookingRepository.findByBooker(booker, formPageable(from, size, sort));
+                bookings = bookingRepository.findByBooker(booker, pageable);
                 break;
         }
         return bookingDtoMapper.toDto(bookings);
     }
 
     @Override
-    public List<BookingDtoOut> findByOwner(long ownerId, BookingSearchState state, long from, Integer size) {
+    public List<BookingDtoOut> findByOwner(long ownerId, BookingSearchState state, long from, int size) {
         User owner = getUser(ownerId);
         List<Booking> bookings;
         LocalDateTime now = LocalDateTime.now();
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+        PageRequest pageable = formPageable(from, size, Sort.by(Sort.Direction.DESC, "start"));
         switch (state) {
             case PAST:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByItemOwnerAndEndIsBefore(owner, now, sort) :
-                        bookingRepository.findByItemOwnerAndEndIsBefore(owner, now, formPageable(from, size, sort));
+                bookings = bookingRepository.findByItemOwnerAndEndIsBefore(owner, now, pageable);
                 break;
             case FUTURE:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByItemOwnerAndStartIsAfter(owner, now, sort) :
-                        bookingRepository.findByItemOwnerAndStartIsAfter(owner, now, formPageable(from, size, sort));
+                bookings = bookingRepository.findByItemOwnerAndStartIsAfter(owner, now, pageable);
                 break;
             case CURRENT:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByItemOwnerAndStartIsBeforeAndEndIsAfter(owner, now, now, sort) :
-                        bookingRepository.findByItemOwnerAndStartIsBeforeAndEndIsAfter(owner, now, now,
-                                formPageable(from, size, sort));
+                bookings = bookingRepository.findByItemOwnerAndStartIsBeforeAndEndIsAfter(owner, now, now, pageable);
                 break;
             case WAITING:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.WAITING, sort) :
-                        bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.WAITING,
-                                formPageable(from, size, sort));
+                bookings = bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.WAITING, pageable);
                 break;
             case REJECTED:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.REJECTED, sort) :
-                        bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.REJECTED,
-                                formPageable(from, size, sort));
+                bookings = bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.REJECTED, pageable);
                 break;
             case ALL:
             default:
-                bookings = Objects.isNull(size) ?
-                        bookingRepository.findByItemOwner(owner, sort) :
-                        bookingRepository.findByItemOwner(owner, formPageable(from, size, sort));
+                bookings = bookingRepository.findByItemOwner(owner, pageable);
                 break;
         }
         return bookingDtoMapper.toDto(bookings);

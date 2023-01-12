@@ -304,7 +304,7 @@ class BookingServiceImplTest {
         long bookerId = entity.getBooker().getId();
         BookingSearchState searchState = BookingSearchState.PAST;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(bookerId))
@@ -326,9 +326,6 @@ class BookingServiceImplTest {
                 Mockito.argThat(now -> Objects.nonNull(now) &&
                         !now.isBefore(minNow) && !now.isAfter(maxNow)),
                 Mockito.eq(PageRequest.of(0, 1, sort)));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBookerAndEndIsBefore(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(Sort.class));
     }
 
     @Test
@@ -339,7 +336,7 @@ class BookingServiceImplTest {
         long bookerId = entity.getBooker().getId();
         BookingSearchState searchState = BookingSearchState.FUTURE;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(bookerId))
@@ -361,9 +358,6 @@ class BookingServiceImplTest {
                 Mockito.argThat(now -> Objects.nonNull(now) &&
                         !now.isBefore(minNow) && !now.isAfter(maxNow)),
                 Mockito.eq(PageRequest.of(0, 1, sort)));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBookerAndStartIsAfter(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(Sort.class));
     }
 
     @Test
@@ -374,7 +368,7 @@ class BookingServiceImplTest {
         long bookerId = entity.getBooker().getId();
         BookingSearchState searchState = BookingSearchState.CURRENT;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(bookerId))
@@ -399,9 +393,6 @@ class BookingServiceImplTest {
                 Mockito.argThat(now -> Objects.nonNull(now) &&
                         !now.isBefore(minNow) && !now.isAfter(maxNow)),
                 Mockito.eq(PageRequest.of(0, 1, sort)));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBookerAndStartIsBeforeAndEndIsAfter(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(LocalDateTime.class), Mockito.any(Sort.class));
     }
 
     @Test
@@ -412,7 +403,7 @@ class BookingServiceImplTest {
         long bookerId = entity.getBooker().getId();
         BookingSearchState searchState = BookingSearchState.WAITING;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(bookerId))
@@ -426,10 +417,6 @@ class BookingServiceImplTest {
 
         assertEquals(List.of(expectedDto),
                 bookingService.findByBooker(bookerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBookerAndStatusIs(Mockito.any(User.class),
-                        Mockito.any(BookingStatus.class), Mockito.any(Sort.class));
     }
 
     @Test
@@ -440,7 +427,7 @@ class BookingServiceImplTest {
         long bookerId = entity.getBooker().getId();
         BookingSearchState searchState = BookingSearchState.REJECTED;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(bookerId))
@@ -454,10 +441,6 @@ class BookingServiceImplTest {
 
         assertEquals(List.of(expectedDto),
                 bookingService.findByBooker(bookerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBookerAndStatusIs(Mockito.any(User.class),
-                        Mockito.any(BookingStatus.class), Mockito.any(Sort.class));
     }
 
     @Test
@@ -468,7 +451,7 @@ class BookingServiceImplTest {
         long bookerId = entity.getBooker().getId();
         BookingSearchState searchState = BookingSearchState.ALL;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(bookerId))
@@ -481,200 +464,6 @@ class BookingServiceImplTest {
 
         assertEquals(List.of(expectedDto),
                 bookingService.findByBooker(bookerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBooker(Mockito.any(User.class), Mockito.any(Sort.class));
-    }
-
-    @Test
-    void findByBookerWithSearchStatePastAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        long bookerId = entity.getBooker().getId();
-        BookingSearchState searchState = BookingSearchState.PAST;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(bookerId))
-                .thenReturn(Optional.of(entity.getBooker()));
-        Mockito.lenient().when(bookingRepository.findByBookerAndEndIsBefore(
-                        Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class),
-                        Mockito.any(Sort.class)))
-                .thenReturn(List.of(entity));
-
-        LocalDateTime minNow = LocalDateTime.now();
-        assertEquals(List.of(expectedDto),
-                bookingService.findByBooker(bookerId, searchState, from, size));
-        LocalDateTime maxNow = LocalDateTime.now();
-
-        Mockito.verify(bookingRepository).findByBookerAndEndIsBefore(
-                Mockito.argThat(booker -> Objects.nonNull(booker) &&
-                        Objects.equals(booker.getId(), entity.getBooker().getId())),
-                Mockito.argThat(now -> Objects.nonNull(now) &&
-                        !now.isBefore(minNow) && !now.isAfter(maxNow)),
-                Mockito.eq(sort));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBookerAndEndIsBefore(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
-    }
-
-    @Test
-    void findByBookerWithSearchStateFutureAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        long bookerId = entity.getBooker().getId();
-        BookingSearchState searchState = BookingSearchState.FUTURE;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(bookerId))
-                .thenReturn(Optional.of(entity.getBooker()));
-        Mockito.lenient().when(bookingRepository.findByBookerAndStartIsAfter(
-                        Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class),
-                        Mockito.any(Sort.class)))
-                .thenReturn(List.of(entity));
-
-        LocalDateTime minNow = LocalDateTime.now();
-        assertEquals(List.of(expectedDto),
-                bookingService.findByBooker(bookerId, searchState, from, size));
-        LocalDateTime maxNow = LocalDateTime.now();
-
-        Mockito.verify(bookingRepository).findByBookerAndStartIsAfter(
-                Mockito.argThat(booker -> Objects.nonNull(booker) &&
-                        Objects.equals(booker.getId(), entity.getBooker().getId())),
-                Mockito.argThat(now -> Objects.nonNull(now) &&
-                        !now.isBefore(minNow) && !now.isAfter(maxNow)),
-                Mockito.eq(sort));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBookerAndStartIsAfter(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
-    }
-
-    @Test
-    void findByBookerWithSearchStateCurrentAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        long bookerId = entity.getBooker().getId();
-        BookingSearchState searchState = BookingSearchState.CURRENT;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(bookerId))
-                .thenReturn(Optional.of(entity.getBooker()));
-        Mockito.lenient().when(bookingRepository.findByBookerAndStartIsBeforeAndEndIsAfter(
-                        Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class),
-                        Mockito.any(LocalDateTime.class),
-                        Mockito.any(Sort.class)))
-                .thenReturn(List.of(entity));
-
-        LocalDateTime minNow = LocalDateTime.now();
-        assertEquals(List.of(expectedDto),
-                bookingService.findByBooker(bookerId, searchState, from, size));
-        LocalDateTime maxNow = LocalDateTime.now();
-
-        Mockito.verify(bookingRepository).findByBookerAndStartIsBeforeAndEndIsAfter(
-                Mockito.argThat(booker -> Objects.nonNull(booker) &&
-                        Objects.equals(booker.getId(), entity.getBooker().getId())),
-                Mockito.argThat(now -> Objects.nonNull(now) &&
-                        !now.isBefore(minNow) && !now.isAfter(maxNow)),
-                Mockito.argThat(now -> Objects.nonNull(now) &&
-                        !now.isBefore(minNow) && !now.isAfter(maxNow)),
-                Mockito.eq(sort));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBookerAndStartIsBeforeAndEndIsAfter(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(LocalDateTime.class),
-                        Mockito.any(Pageable.class));
-    }
-
-    @Test
-    void findByBookerWithSearchStateWaitingAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        long bookerId = entity.getBooker().getId();
-        BookingSearchState searchState = BookingSearchState.WAITING;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(bookerId))
-                .thenReturn(Optional.of(entity.getBooker()));
-        Mockito.lenient().when(bookingRepository.findByBookerAndStatusIs(
-                        Mockito.argThat(booker -> Objects.nonNull(booker) &&
-                                Objects.equals(booker.getId(), entity.getBooker().getId())),
-                        Mockito.eq(BookingStatus.WAITING),
-                        Mockito.eq(sort)))
-                .thenReturn(List.of(entity));
-
-        assertEquals(List.of(expectedDto),
-                bookingService.findByBooker(bookerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBookerAndStatusIs(Mockito.any(User.class),
-                        Mockito.any(BookingStatus.class), Mockito.any(Pageable.class));
-    }
-
-    @Test
-    void findByBookerWithSearchStateRejectedAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        long bookerId = entity.getBooker().getId();
-        BookingSearchState searchState = BookingSearchState.REJECTED;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(bookerId))
-                .thenReturn(Optional.of(entity.getBooker()));
-        Mockito.lenient().when(bookingRepository.findByBookerAndStatusIs(
-                        Mockito.argThat(booker -> Objects.nonNull(booker) &&
-                                Objects.equals(booker.getId(), entity.getBooker().getId())),
-                        Mockito.eq(BookingStatus.REJECTED),
-                        Mockito.eq(sort)))
-                .thenReturn(List.of(entity));
-
-        assertEquals(List.of(expectedDto),
-                bookingService.findByBooker(bookerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBookerAndStatusIs(Mockito.any(User.class),
-                        Mockito.any(BookingStatus.class), Mockito.any(Pageable.class));
-    }
-
-    @Test
-    void findByBookerWithSearchStateAllAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        long bookerId = entity.getBooker().getId();
-        BookingSearchState searchState = BookingSearchState.ALL;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(bookerId))
-                .thenReturn(Optional.of(entity.getBooker()));
-        Mockito.lenient().when(bookingRepository.findByBooker(
-                        Mockito.argThat(booker -> Objects.nonNull(booker) &&
-                                Objects.equals(booker.getId(), entity.getBooker().getId())),
-                        Mockito.eq(sort)))
-                .thenReturn(List.of(entity));
-
-        assertEquals(List.of(expectedDto),
-                bookingService.findByBooker(bookerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByBooker(Mockito.any(User.class), Mockito.any(Pageable.class));
     }
 
     @Test
@@ -694,7 +483,7 @@ class BookingServiceImplTest {
         long ownerId = owner.getId();
         BookingSearchState searchState = BookingSearchState.PAST;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(ownerId))
@@ -716,9 +505,6 @@ class BookingServiceImplTest {
                 Mockito.argThat(now -> Objects.nonNull(now) &&
                         !now.isBefore(minNow) && !now.isAfter(maxNow)),
                 Mockito.eq(PageRequest.of(0, 1, sort)));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwnerAndEndIsBefore(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(Sort.class));
     }
 
     @Test
@@ -730,7 +516,7 @@ class BookingServiceImplTest {
         long ownerId = owner.getId();
         BookingSearchState searchState = BookingSearchState.FUTURE;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(ownerId))
@@ -752,9 +538,6 @@ class BookingServiceImplTest {
                 Mockito.argThat(now -> Objects.nonNull(now) &&
                         !now.isBefore(minNow) && !now.isAfter(maxNow)),
                 Mockito.eq(PageRequest.of(0, 1, sort)));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwnerAndStartIsAfter(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(Sort.class));
     }
 
     @Test
@@ -766,7 +549,7 @@ class BookingServiceImplTest {
         long ownerId = owner.getId();
         BookingSearchState searchState = BookingSearchState.CURRENT;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(ownerId))
@@ -791,9 +574,6 @@ class BookingServiceImplTest {
                 Mockito.argThat(now -> Objects.nonNull(now) &&
                         !now.isBefore(minNow) && !now.isAfter(maxNow)),
                 Mockito.eq(PageRequest.of(0, 1, sort)));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwnerAndStartIsBeforeAndEndIsAfter(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(LocalDateTime.class), Mockito.any(Sort.class));
     }
 
     @Test
@@ -805,7 +585,7 @@ class BookingServiceImplTest {
         long ownerId = owner.getId();
         BookingSearchState searchState = BookingSearchState.WAITING;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(ownerId))
@@ -819,10 +599,6 @@ class BookingServiceImplTest {
 
         assertEquals(List.of(expectedDto),
                 bookingService.findByOwner(ownerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwnerAndStatusIs(Mockito.any(User.class),
-                        Mockito.any(BookingStatus.class), Mockito.any(Sort.class));
     }
 
     @Test
@@ -834,7 +610,7 @@ class BookingServiceImplTest {
         long ownerId = owner.getId();
         BookingSearchState searchState = BookingSearchState.REJECTED;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(ownerId))
@@ -848,10 +624,6 @@ class BookingServiceImplTest {
 
         assertEquals(List.of(expectedDto),
                 bookingService.findByOwner(ownerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwnerAndStatusIs(Mockito.any(User.class),
-                        Mockito.any(BookingStatus.class), Mockito.any(Sort.class));
     }
 
     @Test
@@ -863,7 +635,7 @@ class BookingServiceImplTest {
         long ownerId = owner.getId();
         BookingSearchState searchState = BookingSearchState.ALL;
         long from = 0;
-        Integer size = 1;
+        int size = 1;
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Mockito.lenient().when(userRepository.findById(ownerId))
@@ -876,205 +648,5 @@ class BookingServiceImplTest {
 
         assertEquals(List.of(expectedDto),
                 bookingService.findByOwner(ownerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwner(Mockito.any(User.class), Mockito.any(Sort.class));
-    }
-
-    @Test
-    void findByOwnerWithSearchStatePastAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        User owner = entity.getItem().getOwner();
-        long ownerId = owner.getId();
-        BookingSearchState searchState = BookingSearchState.PAST;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(ownerId))
-                .thenReturn(Optional.of(owner));
-        Mockito.lenient().when(bookingRepository.findByItemOwnerAndEndIsBefore(
-                        Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class),
-                        Mockito.any(Sort.class)))
-                .thenReturn(List.of(entity));
-
-        LocalDateTime minNow = LocalDateTime.now();
-        assertEquals(List.of(expectedDto),
-                bookingService.findByOwner(ownerId, searchState, from, size));
-        LocalDateTime maxNow = LocalDateTime.now();
-
-        Mockito.verify(bookingRepository).findByItemOwnerAndEndIsBefore(
-                Mockito.argThat(user -> Objects.nonNull(user) &&
-                        Objects.equals(user.getId(), owner.getId())),
-                Mockito.argThat(now -> Objects.nonNull(now) &&
-                        !now.isBefore(minNow) && !now.isAfter(maxNow)),
-                Mockito.eq(sort));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwnerAndEndIsBefore(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
-    }
-
-    @Test
-    void findByOwnerWithSearchStateFutureAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        User owner = entity.getItem().getOwner();
-        long ownerId = owner.getId();
-        BookingSearchState searchState = BookingSearchState.FUTURE;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(ownerId))
-                .thenReturn(Optional.of(owner));
-        Mockito.lenient().when(bookingRepository.findByItemOwnerAndStartIsAfter(
-                        Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class),
-                        Mockito.any(Sort.class)))
-                .thenReturn(List.of(entity));
-
-        LocalDateTime minNow = LocalDateTime.now();
-        assertEquals(List.of(expectedDto),
-                bookingService.findByOwner(ownerId, searchState, from, size));
-        LocalDateTime maxNow = LocalDateTime.now();
-
-        Mockito.verify(bookingRepository).findByItemOwnerAndStartIsAfter(
-                Mockito.argThat(user -> Objects.nonNull(user) &&
-                        Objects.equals(user.getId(), owner.getId())),
-                Mockito.argThat(now -> Objects.nonNull(now) &&
-                        !now.isBefore(minNow) && !now.isAfter(maxNow)),
-                Mockito.eq(sort));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwnerAndStartIsAfter(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
-    }
-
-    @Test
-    void findByOwnerWithSearchStateCurrentAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        User owner = entity.getItem().getOwner();
-        long ownerId = owner.getId();
-        BookingSearchState searchState = BookingSearchState.CURRENT;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(ownerId))
-                .thenReturn(Optional.of(owner));
-        Mockito.lenient().when(bookingRepository.findByItemOwnerAndStartIsBeforeAndEndIsAfter(
-                        Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class),
-                        Mockito.any(LocalDateTime.class),
-                        Mockito.any(Sort.class)))
-                .thenReturn(List.of(entity));
-
-        LocalDateTime minNow = LocalDateTime.now();
-        assertEquals(List.of(expectedDto),
-                bookingService.findByOwner(ownerId, searchState, from, size));
-        LocalDateTime maxNow = LocalDateTime.now();
-
-        Mockito.verify(bookingRepository).findByItemOwnerAndStartIsBeforeAndEndIsAfter(
-                Mockito.argThat(user -> Objects.nonNull(user) &&
-                        Objects.equals(user.getId(), owner.getId())),
-                Mockito.argThat(now -> Objects.nonNull(now) &&
-                        !now.isBefore(minNow) && !now.isAfter(maxNow)),
-                Mockito.argThat(now -> Objects.nonNull(now) &&
-                        !now.isBefore(minNow) && !now.isAfter(maxNow)),
-                Mockito.eq(sort));
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwnerAndStartIsBeforeAndEndIsAfter(Mockito.any(User.class),
-                        Mockito.any(LocalDateTime.class), Mockito.any(LocalDateTime.class),
-                        Mockito.any(Pageable.class));
-    }
-
-    @Test
-    void findByOwnerWithSearchStateWaitingAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        User owner = entity.getItem().getOwner();
-        long ownerId = owner.getId();
-        BookingSearchState searchState = BookingSearchState.WAITING;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(ownerId))
-                .thenReturn(Optional.of(owner));
-        Mockito.lenient().when(bookingRepository.findByItemOwnerAndStatusIs(
-                        Mockito.argThat(user -> Objects.nonNull(user) &&
-                                Objects.equals(user.getId(), owner.getId())),
-                        Mockito.eq(BookingStatus.WAITING),
-                        Mockito.eq(sort)))
-                .thenReturn(List.of(entity));
-
-        assertEquals(List.of(expectedDto),
-                bookingService.findByOwner(ownerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwnerAndStatusIs(Mockito.any(User.class),
-                        Mockito.any(BookingStatus.class), Mockito.any(Pageable.class));
-    }
-
-    @Test
-    void findByOwnerWithSearchStateRejectedAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        User owner = entity.getItem().getOwner();
-        long ownerId = owner.getId();
-        BookingSearchState searchState = BookingSearchState.REJECTED;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(ownerId))
-                .thenReturn(Optional.of(owner));
-        Mockito.lenient().when(bookingRepository.findByItemOwnerAndStatusIs(
-                        Mockito.argThat(user -> Objects.nonNull(user) &&
-                                Objects.equals(user.getId(), owner.getId())),
-                        Mockito.eq(BookingStatus.REJECTED),
-                        Mockito.eq(sort)))
-                .thenReturn(List.of(entity));
-
-        assertEquals(List.of(expectedDto),
-                bookingService.findByOwner(ownerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwnerAndStatusIs(Mockito.any(User.class),
-                        Mockito.any(BookingStatus.class), Mockito.any(Pageable.class));
-    }
-
-    @Test
-    void findByOwnerWithSearchStateAllAndWithoutPaginationAndThenReturnListOfDto() {
-        TestBookingBuilder bookingBuilder = TestBookingBuilder.defaultBuilder();
-        Booking entity = bookingBuilder.buildEntity();
-        BookingDtoOut expectedDto = bookingBuilder.buildDtoOut();
-        User owner = entity.getItem().getOwner();
-        long ownerId = owner.getId();
-        BookingSearchState searchState = BookingSearchState.ALL;
-        long from = 0;
-        Integer size = null;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        Mockito.lenient().when(userRepository.findById(ownerId))
-                .thenReturn(Optional.of(owner));
-        Mockito.lenient().when(bookingRepository.findByItemOwner(
-                        Mockito.argThat(user -> Objects.nonNull(user) &&
-                                Objects.equals(user.getId(), owner.getId())),
-                        Mockito.eq(sort)))
-                .thenReturn(List.of(entity));
-
-        assertEquals(List.of(expectedDto),
-                bookingService.findByOwner(ownerId, searchState, from, size));
-
-        Mockito.verify(bookingRepository, Mockito.never())
-                .findByItemOwner(Mockito.any(User.class), Mockito.any(Pageable.class));
     }
 }
