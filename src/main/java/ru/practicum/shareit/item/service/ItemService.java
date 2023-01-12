@@ -11,9 +11,9 @@ public interface ItemService {
 
     ItemDtoOutExtended getById(long id, long userId);
 
-    List<ItemDtoOutExtended> getAll(long userId, long from, Integer size);
+    List<ItemDtoOutExtended> getAll(long userId, long from, int size);
 
-    List<ItemDto> search(String text, long from, Integer size);
+    List<ItemDto> search(String text, long from, int size);
 
     CommentDtoOut addComment(CommentDtoIn dto, long itemId, long userId);
 }

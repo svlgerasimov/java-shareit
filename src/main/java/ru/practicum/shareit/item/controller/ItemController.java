@@ -29,14 +29,14 @@ public class ItemController {
     @GetMapping
     public List<ItemDtoOutExtended> getAll(@RequestHeader("X-Sharer-User-Id") long userId,
                                            @RequestParam(defaultValue = "0") @PositiveOrZero Long from,
-                                           @RequestParam(required = false) @Positive Integer size) {
+                                           @RequestParam(defaultValue = "10") @Positive Integer size) {
         return itemService.getAll(userId, from, size);
     }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text,
                                 @RequestParam(defaultValue = "0") @PositiveOrZero Long from,
-                                @RequestParam(required = false) @Positive Integer size) {
+                                @RequestParam(defaultValue = "10") @Positive Integer size) {
         return text.isBlank() ? Collections.emptyList() : itemService.search(text, from, size);
     }
 

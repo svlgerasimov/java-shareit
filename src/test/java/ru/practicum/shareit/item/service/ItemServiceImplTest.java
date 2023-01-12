@@ -485,7 +485,7 @@ class ItemServiceImplTest {
         TestItemBuilder itemBuilder = TestItemBuilder.defaultBuilder();
         Item itemEntity = itemBuilder.buildEntity();
         long from = 0;
-        Integer size = 1;
+        int size = 1;
 
         Mockito.when(userRepository.findById(itemEntity.getOwner().getId()))
                 .thenReturn(Optional.of(itemEntity.getOwner()));
@@ -504,38 +504,6 @@ class ItemServiceImplTest {
 
         assertEquals(List.of(itemBuilder.buildDtoOutExtended()),
                 itemService.getAll(itemEntity.getOwner().getId(), from, size));
-
-        Mockito.verify(itemRepository, Mockito.never())
-                .findAllByOwner(Mockito.any(User.class), Mockito.any(Sort.class));
-    }
-
-    @Test
-    void getAllCorrectWithoutPaginationAndThenReturnDtoList() {
-        TestItemBuilder itemBuilder = TestItemBuilder.defaultBuilder();
-        Item itemEntity = itemBuilder.buildEntity();
-        long from = 0;
-        Integer size = null;
-
-        Mockito.when(userRepository.findById(itemEntity.getOwner().getId()))
-                .thenReturn(Optional.of(itemEntity.getOwner()));
-        Mockito.when(itemRepository.findAllByOwner(Mockito.any(User.class), Mockito.any(Sort.class)))
-                .thenReturn(List.of(itemEntity));
-        Mockito.when(commentRepository.findAllByItemIn(Mockito.anyList()))
-                .thenReturn(itemBuilder.buildComments());
-        Mockito.when(bookingRepository.findAllByItemInAndStartLessThanEqualAndStatusIs(
-                        Mockito.anyList(), Mockito.any(LocalDateTime.class),
-                        Mockito.any(BookingStatus.class), Mockito.any(Sort.class)))
-                .thenReturn(List.of(itemBuilder.buildLastBooking()));
-        Mockito.when(bookingRepository.findAllByItemInAndStartAfterAndStatusIs(
-                        Mockito.anyList(), Mockito.any(LocalDateTime.class),
-                        Mockito.any(BookingStatus.class), Mockito.any(Sort.class)))
-                .thenReturn(List.of(itemBuilder.buildNextBooking()));
-
-        assertEquals(List.of(itemBuilder.buildDtoOutExtended()),
-                itemService.getAll(itemEntity.getOwner().getId(), from, size));
-
-        Mockito.verify(itemRepository, Mockito.never())
-                .findAllByOwner(Mockito.any(User.class), Mockito.any(Pageable.class));
     }
 
     @Test
@@ -563,25 +531,6 @@ class ItemServiceImplTest {
 
         Mockito.verify(itemRepository, Mockito.never())
                 .search(Mockito.any(String.class), Mockito.eq(Pageable.unpaged()));
-    }
-
-    @Test
-    void searchWithoutPaginationAndThenReturnListOfDto() {
-        TestItemBuilder itemBuilder = TestItemBuilder.defaultBuilder();
-        Item itemEntity = itemBuilder.buildEntity();
-        String text = "TeXt";
-        String lowerCaseText = "text";
-        long from = 0;
-        Integer size = null;
-
-        Mockito.when(itemRepository.search(lowerCaseText, Pageable.unpaged()))
-                .thenReturn(List.of(itemEntity));
-
-        assertEquals(List.of(itemBuilder.buildDto()),
-                itemService.search(text, from, size));
-
-        Mockito.verify(itemRepository, Mockito.never())
-                .search(Mockito.any(String.class), Mockito.any(PageRequest.class));
     }
 
     @Test

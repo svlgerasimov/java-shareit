@@ -151,7 +151,7 @@ class ItemControllerTest {
 
         ItemDtoOutExtended expectedDto = itemBuilder.buildDtoExtended();
 
-        when(itemService.getAll(userId, 0, null))
+        when(itemService.getAll(userId, 0, 10))
                 .thenReturn(List.of(expectedDto));
 
         mvc.perform(get("/items")
@@ -167,7 +167,7 @@ class ItemControllerTest {
                         .param("from", "-1"))
                 .andExpect(status().isBadRequest());
 
-        verify(itemService, never()).getAll(anyLong(), anyLong(), any());
+        verify(itemService, never()).getAll(anyLong(), anyLong(), anyInt());
     }
 
     @Test
@@ -177,7 +177,7 @@ class ItemControllerTest {
                         .param("size", "-1"))
                 .andExpect(status().isBadRequest());
 
-        verify(itemService, never()).getAll(anyLong(), anyLong(), any());
+        verify(itemService, never()).getAll(anyLong(), anyLong(), anyInt());
     }
 
     @Test
@@ -187,7 +187,7 @@ class ItemControllerTest {
                         .param("size", "0"))
                 .andExpect(status().isBadRequest());
 
-        verify(itemService, never()).getAll(anyLong(), anyLong(), any());
+        verify(itemService, never()).getAll(anyLong(), anyLong(), anyInt());
     }
 
     @Test
@@ -208,10 +208,10 @@ class ItemControllerTest {
     }
 
     @Test
-    void searchWithoutPaginationAndThenStatusOkAndJsonBody() throws Exception {
+    void searchWithoutPaginationParamsAndThenStatusOkAndJsonBody() throws Exception {
         String text = "text";
 
-        when(itemService.search(text, 0, null))
+        when(itemService.search(text, 0, 10))
                 .thenReturn(List.of(itemBuilder.buildDto()));
 
         mvc.perform(get("/items/search")
@@ -229,7 +229,7 @@ class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(Collections.emptyList())));
 
-        verify(itemService, never()).search(any(), anyLong(), any());
+        verify(itemService, never()).search(any(), anyLong(), anyInt());
     }
 
     @Test
@@ -239,7 +239,7 @@ class ItemControllerTest {
                         .param("from", "-1"))
                 .andExpect(status().isBadRequest());
 
-        verify(itemService, never()).search(any(), anyLong(), any());
+        verify(itemService, never()).search(any(), anyLong(), anyInt());
     }
 
     @Test
@@ -249,7 +249,7 @@ class ItemControllerTest {
                         .param("size", "-1"))
                 .andExpect(status().isBadRequest());
 
-        verify(itemService, never()).search(any(), anyLong(), any());
+        verify(itemService, never()).search(any(), anyLong(), anyInt());
     }
 
     @Test
@@ -259,7 +259,7 @@ class ItemControllerTest {
                         .param("size", "0"))
                 .andExpect(status().isBadRequest());
 
-        verify(itemService, never()).search(any(), anyLong(), any());
+        verify(itemService, never()).search(any(), anyLong(), anyInt());
     }
 
     @Test

@@ -82,11 +82,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoOutExtended> getAll(long userId, long from, Integer size) {
+    public List<ItemDtoOutExtended> getAll(long userId, long from, int size) {
         User owner = getUser(userId);
-        Sort sort = Sort.by(Sort.Direction.ASC, "id");
-        List<Item> items = Objects.isNull(size) ? itemRepository.findAllByOwner(owner, sort) :
-                itemRepository.findAllByOwner(owner, PageRequest.of((int) (from / size), size, sort));
+        Pageable pageable = PageRequest.of((int) (from / size), size, Sort.by(Sort.Direction.ASC, "id"));
+        List<Item> items = itemRepository.findAllByOwner(owner, pageable);
         List<Comment> comments = commentRepository.findAllByItemIn(items);
         Map<Long, List<Comment>> commentsByItemIds = comments.stream()
                 .collect(Collectors.groupingBy(comment -> comment.getItem().getId(), Collectors.toList()));
@@ -110,8 +109,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text, long from, Integer size) {
-        Pageable pageable = Objects.isNull(size) ? Pageable.unpaged() : PageRequest.of((int) (from / size), size);
+    public List<ItemDto> search(String text, long from, int size) {
+        Pageable pageable = PageRequest.of((int) (from / size), size);
         return itemRepository.search(text.toLowerCase(), pageable).stream()
                 .map(itemDtoMapper::toDto)
                 .collect(Collectors.toList());
