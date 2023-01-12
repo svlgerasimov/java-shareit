@@ -146,11 +146,11 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    void findAllByOtherUsersWithoutPaginationAndThenStatusOkAndJsonArrayBody() throws Exception {
+    void findAllByOtherUsersWithoutPaginationParamsAndThenStatusOkAndJsonArrayBody() throws Exception {
         long userId = 1001L;
         ItemRequestDtoOutExtended expectedDto = itemRequestBuilder.buildDtoOutExtended();
 
-        when(itemRequestService.findByOtherUsers(userId, 0, null))
+        when(itemRequestService.findByOtherUsers(userId, 0, 10))
                 .thenReturn(List.of(expectedDto));
 
         mvc.perform(get("/requests/all")
@@ -168,7 +168,7 @@ class ItemRequestControllerTest {
                         .header("X-Sharer-User-Id", String.valueOf(userId)))
                 .andExpect(status().isBadRequest());
 
-        verify(itemRequestService, never()).findByOtherUsers(anyLong(), anyLong(), any());
+        verify(itemRequestService, never()).findByOtherUsers(anyLong(), anyLong(), anyInt());
     }
 
     @Test
@@ -180,7 +180,7 @@ class ItemRequestControllerTest {
                         .header("X-Sharer-User-Id", String.valueOf(userId)))
                 .andExpect(status().isBadRequest());
 
-        verify(itemRequestService, never()).findByOtherUsers(anyLong(), anyLong(), any());
+        verify(itemRequestService, never()).findByOtherUsers(anyLong(), anyLong(), anyInt());
     }
 
     @Test
@@ -192,7 +192,7 @@ class ItemRequestControllerTest {
                         .header("X-Sharer-User-Id", String.valueOf(userId)))
                 .andExpect(status().isBadRequest());
 
-        verify(itemRequestService, never()).findByOtherUsers(anyLong(), anyLong(), any());
+        verify(itemRequestService, never()).findByOtherUsers(anyLong(), anyLong(), anyInt());
     }
 
     @Test

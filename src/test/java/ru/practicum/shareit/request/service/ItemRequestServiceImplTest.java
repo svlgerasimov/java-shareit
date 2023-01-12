@@ -13,7 +13,6 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.practicum.shareit.booking.dto.BookingDtoShortMapperImpl;
@@ -259,40 +258,6 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void findByOtherUsersCorrectWithoutPaginationAndThenReturnListOfDto() {
-        TestRequestBuilder requestBuilder = TestRequestBuilder.defaultBuilder();
-        ItemRequest entity = requestBuilder.buildEntity();
-        long userId = entity.getRequestor().getId() + 1;
-        User user = new User();
-        user.setId(userId);
-        Sort sort = Sort.by(Sort.Direction.DESC, "created");
-
-        Mockito.when(userRepository.findById(userId))
-                .thenReturn(Optional.of(user));
-        Mockito.when(itemRequestRepository.findAllByRequestorIsNot(
-                Mockito.argThat(requestor -> Objects.nonNull(requestor) &&
-                        Objects.equals(requestor.getId(), userId)),
-                Mockito.eq(sort)))
-                .thenReturn(List.of(entity));
-        Mockito.when(itemRepository.findAllByRequestIn(Mockito.argThat(itemRequestList ->
-                        Objects.nonNull(itemRequestList) &&
-                                itemRequestList.size() == 1 &&
-                                Objects.nonNull(itemRequestList.get(0).getId()) &&
-                                Objects.equals(itemRequestList.get(0).getDescription(), entity.getDescription()) &&
-                                Objects.equals(itemRequestList.get(0).getCreated(), entity.getCreated()))))
-                .thenReturn(requestBuilder.buildItems(entity));
-
-        assertEquals(List.of(requestBuilder.buildDtoOutExtended()),
-                itemRequestService.findByOtherUsers(userId, 0, null));
-
-        Mockito.verify(itemRequestRepository, Mockito.never())
-                .findAllByRequestorIsNot(
-                        Mockito.any(User.class),
-                        Mockito.any(Pageable.class)
-                );
-    }
-
-    @Test
     void findByOtherUsersCorrectWithPaginationAndThenReturnListOfDto() {
         TestRequestBuilder requestBuilder = TestRequestBuilder.defaultBuilder();
         ItemRequest entity = requestBuilder.buildEntity();
@@ -318,12 +283,6 @@ class ItemRequestServiceImplTest {
 
         assertEquals(List.of(requestBuilder.buildDtoOutExtended()),
                 itemRequestService.findByOtherUsers(userId, 0, 1));
-
-        Mockito.verify(itemRequestRepository, Mockito.never())
-                .findAllByRequestorIsNot(
-                        Mockito.any(User.class),
-                        Mockito.any(Sort.class)
-                );
     }
 
     @Test

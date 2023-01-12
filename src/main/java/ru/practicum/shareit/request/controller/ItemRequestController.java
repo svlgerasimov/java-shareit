@@ -36,7 +36,7 @@ public class ItemRequestController {
     @GetMapping("/all")
     public List<ItemRequestDtoOutExtended> findAllByOtherUsers(
             @RequestParam(defaultValue = "0") @PositiveOrZero Long from,
-            @RequestParam(required = false) @Positive Integer size,
+            @RequestParam(defaultValue = "10") @Positive Integer size,
             @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemRequestService.findByOtherUsers(userId, from, size);
     }

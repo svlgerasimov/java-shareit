@@ -13,5 +13,5 @@ public interface ItemRequestService {
 
     List<ItemRequestDtoOutExtended> findByRequestor(long requestorId);
 
-    List<ItemRequestDtoOutExtended> findByOtherUsers(long userId, long from, Integer size);
+    List<ItemRequestDtoOutExtended> findByOtherUsers(long userId, long from, int size);
 }

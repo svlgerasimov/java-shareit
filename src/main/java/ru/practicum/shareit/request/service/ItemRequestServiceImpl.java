@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +23,6 @@ import ru.practicum.shareit.user.storage.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,14 +66,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDtoOutExtended> findByOtherUsers(long userId, long from, Integer size) {
+    public List<ItemRequestDtoOutExtended> findByOtherUsers(long userId, long from, int size) {
         User exceptedRequestor = getUser(userId);
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
-        List<ItemRequest> itemRequests =
-                Objects.isNull(size) ?
-                        itemRequestRepository.findAllByRequestorIsNot(exceptedRequestor, sort) :
-                        itemRequestRepository.findAllByRequestorIsNot(exceptedRequestor,
-                                PageRequest.of((int) (from / size), size, sort));
+        Pageable pageable = PageRequest.of((int) (from / size), size, sort);
+        List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequestorIsNot(exceptedRequestor, pageable);
         List<Item> items = itemRepository.findAllByRequestIn(itemRequests);
         return itemRequestDtoMapper.toExtendedDto(itemRequests, formItemsByRequestIds(items));
     }
