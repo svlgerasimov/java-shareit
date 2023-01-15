@@ -22,15 +22,15 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoOutExtended> getAll(@RequestHeader("X-Sharer-User-Id") long userId,
-                                           @RequestParam(defaultValue = "0") Long from,
-                                           @RequestParam(defaultValue = "10") Integer size) {
+                                           @RequestParam Long from,
+                                           @RequestParam Integer size) {
         return itemService.getAll(userId, from, size);
     }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text,
-                                @RequestParam(defaultValue = "0") Long from,
-                                @RequestParam(defaultValue = "10") Integer size) {
+                                @RequestParam Long from,
+                                @RequestParam Integer size) {
         return itemService.search(text, from, size);
     }
 

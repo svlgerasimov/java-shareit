@@ -46,7 +46,7 @@ public class BookingClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return super.get("?state={state}&from={from}&{size}=size", userId, parameters);
+        return super.get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
     ResponseEntity<Object> findByOwner(long userId, BookingSearchState state, long from, int size) {
@@ -55,6 +55,6 @@ public class BookingClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return super.get("/owner?state={state}&from={from}&{size}=size", userId, parameters);
+        return super.get("/owner?state={state}&from={from}&size={size}", userId, parameters);
     }
 }
