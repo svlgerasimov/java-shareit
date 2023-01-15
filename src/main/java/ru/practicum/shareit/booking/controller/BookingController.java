@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
@@ -9,11 +10,14 @@ import ru.practicum.shareit.booking.dto.BookingSearchState;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Validated
 public class BookingController {
 
     private final BookingService bookingService;
@@ -40,14 +44,18 @@ public class BookingController {
     @GetMapping
     public List<BookingDtoOut> findByBooker(
             @RequestParam(defaultValue = "ALL") String state,
-            @RequestHeader("X-Sharer-User-Id") long userId) {
-        return bookingService.findByBooker(userId, BookingSearchState.of(state));
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestParam(defaultValue = "0") @PositiveOrZero Long from,
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
+        return bookingService.findByBooker(userId, BookingSearchState.of(state), from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDtoOut> findByOwner(
             @RequestParam(defaultValue = "ALL") String state,
-            @RequestHeader("X-Sharer-User-Id") long userId) {
-        return bookingService.findByOwner(userId, BookingSearchState.of(state));
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestParam(defaultValue = "0") @PositiveOrZero Long from,
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
+        return bookingService.findByOwner(userId, BookingSearchState.of(state), from, size);
     }
 }

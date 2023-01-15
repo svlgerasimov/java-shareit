@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +48,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setBooker(booker);
         booking.setItem(item);
         booking = bookingRepository.save(booking);
-        log.debug("Add booking " + booking);
+        log.debug("Add booking {}", booking);
         return bookingDtoMapper.toDto(booking);
     }
 
@@ -61,7 +62,7 @@ public class BookingServiceImpl implements BookingService {
             throw new CustomValidationException("Booking already has been approved/rejected");
         }
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        log.debug("Approved booking " + booking);
+        log.debug("Approved booking {}", booking);
         return bookingDtoMapper.toDto(booking);
     }
 
@@ -74,71 +75,67 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoOut> findByBooker(long bookerId, BookingSearchState state) {
+    public List<BookingDtoOut> findByBooker(long bookerId, BookingSearchState state, long from, int size) {
         User booker = getUser(bookerId);
         List<Booking> bookings;
         LocalDateTime now = LocalDateTime.now();
+        PageRequest pageable = formPageable(from, size, Sort.by(Sort.Direction.DESC, "start"));
         switch (state) {
             case PAST:
-                bookings = bookingRepository.findByBookerAndEndIsBefore(booker, now,
-                        Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByBookerAndEndIsBefore(booker, now, pageable);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findByBookerAndStartIsAfter(booker, now,
-                        Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByBookerAndStartIsAfter(booker, now, pageable);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByBookerAndStartIsBeforeAndEndIsAfter(
-                        booker, now, now, Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByBookerAndStartIsBeforeAndEndIsAfter(booker, now, now, pageable);
                 break;
             case WAITING:
-                bookings = bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.WAITING,
-                        Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.WAITING, pageable);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.REJECTED,
-                        Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByBookerAndStatusIs(booker, BookingStatus.REJECTED, pageable);
                 break;
             case ALL:
             default:
-                bookings = bookingRepository.findByBooker(booker, Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByBooker(booker, pageable);
                 break;
         }
         return bookingDtoMapper.toDto(bookings);
     }
 
     @Override
-    public List<BookingDtoOut> findByOwner(long ownerId, BookingSearchState state) {
+    public List<BookingDtoOut> findByOwner(long ownerId, BookingSearchState state, long from, int size) {
         User owner = getUser(ownerId);
         List<Booking> bookings;
         LocalDateTime now = LocalDateTime.now();
+        PageRequest pageable = formPageable(from, size, Sort.by(Sort.Direction.DESC, "start"));
         switch (state) {
             case PAST:
-                bookings = bookingRepository.findByItemOwnerAndEndIsBefore(owner, now,
-                        Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByItemOwnerAndEndIsBefore(owner, now, pageable);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findByItemOwnerAndStartIsAfter(owner, now,
-                        Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByItemOwnerAndStartIsAfter(owner, now, pageable);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByItemOwnerAndStartIsBeforeAndEndIsAfter(
-                        owner, now, now, Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByItemOwnerAndStartIsBeforeAndEndIsAfter(owner, now, now, pageable);
                 break;
             case WAITING:
-                bookings = bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.WAITING,
-                        Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.WAITING, pageable);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.REJECTED,
-                        Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByItemOwnerAndStatusIs(owner, BookingStatus.REJECTED, pageable);
                 break;
             case ALL:
             default:
-                bookings = bookingRepository.findByItemOwner(owner, Sort.by(Sort.Direction.DESC, "start"));
+                bookings = bookingRepository.findByItemOwner(owner, pageable);
                 break;
         }
         return bookingDtoMapper.toDto(bookings);
+    }
+
+    private static PageRequest formPageable(long from, Integer size, Sort sort) {
+        return PageRequest.of((int) (from / size), size, sort);
     }
 
     private User getUser(long userId) {

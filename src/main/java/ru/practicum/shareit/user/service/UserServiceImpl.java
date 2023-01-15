@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto add(UserDto dto) {
         User user = userRepository.save(userDtoMapper.fromDto(dto));
-        log.debug("Add user " + user);
+        log.debug("Add user {}", user);
         return userDtoMapper.toDto(user);
     }
 
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
                         () -> new NotFoundException("User with id=" + id + " not found")
                 );
         userPatchDtoMapper.updateWithPatchDto(user, patchDto);
-        log.debug("Patch user " + user);
+        log.debug("Patch user {}", user);
         return userDtoMapper.toDto(user);
     }
 

@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +19,15 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,6 +41,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final ItemDtoMapper itemDtoMapper;
     private final ItemPatchDtoMapper itemPatchDtoMapper;
     private final CommentDtoMapper commentDtoMapper;
@@ -44,10 +50,13 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemDto add(ItemDto dto, long userId) {
         User owner = getUser(userId);
+        Long itemRequestId = dto.getRequestId();
+        ItemRequest itemRequest = Objects.isNull(itemRequestId) ? null : getItemRequest(itemRequestId);
         Item item = itemDtoMapper.fromDto(dto);
         item.setOwner(owner);
+        item.setRequest(itemRequest);
         item = itemRepository.save(item);
-        log.debug("Add item " + item);
+        log.debug("Add item {}", item);
         return itemDtoMapper.toDto(item);
     }
 
@@ -59,7 +68,7 @@ public class ItemServiceImpl implements ItemService {
             throw new AuthenticationErrorException("User id=" + userId + " is not owner of item id=" + itemId);
         }
         itemPatchDtoMapper.updateWithPatchDto(item, dto);
-        log.debug("Patch item " + item);
+        log.debug("Patch item {}", item);
         return itemDtoMapper.toDto(item);
     }
 
@@ -73,32 +82,36 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoOutExtended> getAll(long userId) {
+    public List<ItemDtoOutExtended> getAll(long userId, long from, int size) {
         User owner = getUser(userId);
-        List<Item> items = itemRepository.findAllByOwner(owner, Sort.by(Sort.Direction.ASC, "id"));
+        Pageable pageable = PageRequest.of((int) (from / size), size, Sort.by(Sort.Direction.ASC, "id"));
+        List<Item> items = itemRepository.findAllByOwner(owner, pageable);
         List<Comment> comments = commentRepository.findAllByItemIn(items);
-        Map<Item, List<Comment>> commentsByItems = comments.stream()
-                .collect(Collectors.groupingBy(Comment::getItem, Collectors.toList()));
+        Map<Long, List<Comment>> commentsByItemIds = comments.stream()
+                .collect(Collectors.groupingBy(comment -> comment.getItem().getId(), Collectors.toList()));
 
         LocalDateTime now = LocalDateTime.now();
         List<Booking> lastBookings = bookingRepository.findAllByItemInAndStartLessThanEqualAndStatusIs(
                 items, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"));
-        Map<Item, Booking> lastBookingsByItems = lastBookings.stream()
-                .collect(Collectors.toMap(Booking::getItem, Function.identity(), (booking1, booking2) -> booking1));
+        Map<Long, Booking> lastBookingsByItemIds = lastBookings.stream()
+                .collect(Collectors.toMap(booking -> booking.getItem().getId(), Function.identity(),
+                        (booking1, booking2) -> booking1));
         List<Booking> nextBookings = bookingRepository.findAllByItemInAndStartAfterAndStatusIs(
                 items, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "start"));
-        Map<Item, Booking> nextBookingsByItems = nextBookings.stream()
-                .collect(Collectors.toMap(Booking::getItem, Function.identity(), (booking1, booking2) -> booking1));
+        Map<Long, Booking> nextBookingsByItemIds = nextBookings.stream()
+                .collect(Collectors.toMap(booking -> booking.getItem().getId(), Function.identity(),
+                        (booking1, booking2) -> booking1));
 
         return items.stream()
-                .map(item -> itemDtoMapper.toDtoExtended(item, commentsByItems.get(item),
-                        lastBookingsByItems.get(item), nextBookingsByItems.get(item)))
+                .map(item -> itemDtoMapper.toDtoExtended(item, commentsByItemIds.get(item.getId()),
+                        lastBookingsByItemIds.get(item.getId()), nextBookingsByItemIds.get(item.getId())))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> search(String text) {
-        return itemRepository.search(text.toLowerCase()).stream()
+    public List<ItemDto> search(String text, long from, int size) {
+        Pageable pageable = PageRequest.of((int) (from / size), size);
+        return itemRepository.search(text.toLowerCase(), pageable).stream()
                 .map(itemDtoMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -116,7 +129,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
         comment = commentRepository.save(comment);
-        log.debug("Add comment: " + comment);
+        log.debug("Add comment {}", comment);
         return commentDtoMapper.toDto(comment);
     }
 
@@ -128,6 +141,11 @@ public class ItemServiceImpl implements ItemService {
     private User getUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+    }
+
+    private ItemRequest getItemRequest(long requestId) {
+        return itemRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Item request with id=" + requestId + " not found"));
     }
 
     private ItemDtoOutExtended formDtoExtended(Item item) {
