@@ -19,6 +19,14 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ErrorHandler {
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleCustomValidationException(CustomValidationException exception) {
+        Map<String, String> result = Map.of("error", exception.getMessage());
+        log.warn(String.valueOf(result), exception);
+        return result;
+    }
+
     // Ошибка валидации полей десериализируемого объекта @Valid
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
