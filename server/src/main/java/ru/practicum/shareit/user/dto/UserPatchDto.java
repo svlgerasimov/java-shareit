@@ -8,10 +8,7 @@ import javax.validation.constraints.Email;
 @Value
 public class UserPatchDto {
 
-    @NullableNotBlank
     String name;
 
-    @Email
-    @NullableNotBlank
     String email;
 }
